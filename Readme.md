@@ -1,7 +1,7 @@
 # Личный проект «Кэндишоп» [![Build status][travis-image]][travis-url]
 
 * Студент: [Ekaterina Senkina](https://up.htmlacademy.ru/javascript/15/user/307607).
-* Наставник: `Неизвестно`.
+* Наставник: Саша Ивашкин.
 
 ---
 
