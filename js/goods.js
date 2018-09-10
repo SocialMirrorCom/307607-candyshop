@@ -130,8 +130,101 @@ var getGoodsList = function (goodsQuantity) {
   return goodsList;
 };
 
+// Создаем массив из 26 объектов товара
 
+var goods = getGoodsList(26);
 
+// Скрываем блок и текст Данные загружаются
+
+var catalogCards = document.querySelector('.catalog__cards');
+catalogCards.classList.remove('catalog__cards--load');
+var catalogLoad = document.querySelector('.catalog__load');
+catalogLoad.classList.add('visually-hidden');
+
+// Находим и сохраняем в переменную каталог товаров
+
+var catalogCardsContainer = document.querySelector('.catalog__cards');
+
+// Находим и сохраняем в переменную шаблон карточки товара
+
+var similarCardTemplate = document.querySelector('#card')
+    .content
+    .querySelector('.catalog__card');
+
+// Функция по созданию одного элемента по шаблону
+
+var renderCard = function (good) {
+  var cardElement = similarCardTemplate.cloneNode(true);
+
+  var goodAmountClass = cardElement.querySelector('.catalog__card');
+  //goodAmountClass.classList.remove('card--in-stock');
+
+  //if (good.amount > 5) {
+    //goodAmountClass.classList.add('card--in-stock');
+  //}
+  //else
+  if (good.amount >= 1 && good.amount <= 5) {
+    goodAmountClass.classList.remove('card--in-stock');
+    goodAmountClass.classList.add('card--little');
+  }
+  else if (good.amount === 0) {
+    goodAmountClass.classList.remove('card--in-stock');
+    goodAmountClass.classList.add('card--soon');
+  }
+
+  cardElement.querySelector('.card__title').textContent = good.name;
+
+  cardElement.querySelector('.card__img').setAttribute('src', good.picture);
+  cardElement.querySelector('.card__img').setAttribute('alt', good.name);
+
+  cardElement.querySelector('.card__price').innerHTML = good.price + ' <span class="card__currency">₽</span><span class="card__weight">/ ' + good.weight + '</span>';
+
+  var starsRating = cardElement.querySelector('.stars__rating');
+
+  if (good.rating.value === 1) {
+    starsRating.classList.add('stars__rating--one');
+  } else
+  if (good.rating.value === 2) {
+    starsRating.classList.add('stars__rating--two');
+  } else
+  if (good.rating.value === 3) {
+    starsRating.classList.add('stars__rating--three');
+  } else
+  if (good.rating.value === 4) {
+    starsRating.classList.add('stars__rating--four');
+  } else
+  if (good.rating.value === 5) {
+    starsRating.classList.add('stars__rating--five');
+  }
+
+  cardElement.querySelector('.star__count').textContent = '(' + good.rating.number + ')';
+
+  var cardCharacteristic = cardElement.querySelector('.card__characteristic');
+
+  if (!good.nutritionFacts.sugar) {
+    cardCharacteristic.textContent = 'Без сахара. ' + good.nutritionFacts.energy + ' ккал';
+  } else {
+    cardCharacteristic.textContent = 'Содержит сахар. ' + good.nutritionFacts.energy + ' ккал';
+  }
+
+  cardElement.querySelector('.card__composition-list').textContent = good.nutritionFacts.contents;
+
+  return cardElement;
+};
+
+// Создаем фрагмент
+
+var fragment = document.createDocumentFragment();
+
+// Вставляем во фрагмент элементы
+
+for (var i = 0; i < goods.length; i++) {
+  fragment.appendChild(renderCard(goods[i]));
+}
+
+// Вставляем фрагмент
+
+catalogCardsContainer.appendChild(fragment);
 
 
 
