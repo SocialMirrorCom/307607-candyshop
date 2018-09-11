@@ -156,20 +156,16 @@ var similarCardTemplate = document.querySelector('#card')
 var renderCard = function (good) {
   var cardElement = similarCardTemplate.cloneNode(true);
 
-  var goodAmountClass = cardElement.querySelector('.catalog__card');
-  //goodAmountClass.classList.remove('card--in-stock');
+  cardElement.classList.remove('card--in-stock');
 
-  //if (good.amount > 5) {
-    //goodAmountClass.classList.add('card--in-stock');
-  //}
-  //else
+  if (good.amount > 5) {
+    cardElement.classList.add('card--in-stock');
+  } else
   if (good.amount >= 1 && good.amount <= 5) {
-    goodAmountClass.classList.remove('card--in-stock');
-    goodAmountClass.classList.add('card--little');
-  }
-  else if (good.amount === 0) {
-    goodAmountClass.classList.remove('card--in-stock');
-    goodAmountClass.classList.add('card--soon');
+    cardElement.classList.add('card--little');
+  } else
+  if (good.amount === 0) {
+    cardElement.classList.add('card--soon');
   }
 
   cardElement.querySelector('.card__title').textContent = good.name;
@@ -177,9 +173,10 @@ var renderCard = function (good) {
   cardElement.querySelector('.card__img').setAttribute('src', good.picture);
   cardElement.querySelector('.card__img').setAttribute('alt', good.name);
 
-  cardElement.querySelector('.card__price').innerHTML = good.price + ' <span class="card__currency">₽</span><span class="card__weight">/ ' + good.weight + '</span>';
+  cardElement.querySelector('.card__price').innerHTML = good.price + '<span class="card__currency">₽</span><span class="card__weight">/' + good.weight + 'Г</span>';
 
   var starsRating = cardElement.querySelector('.stars__rating');
+  starsRating.classList.remove('stars__rating--five');
 
   if (good.rating.value === 1) {
     starsRating.classList.add('stars__rating--one');
@@ -207,6 +204,7 @@ var renderCard = function (good) {
     cardCharacteristic.textContent = 'Содержит сахар. ' + good.nutritionFacts.energy + ' ккал';
   }
 
+  // cardElement.querySelector('.card__composition').classList.remove('card__composition--hidden');
   cardElement.querySelector('.card__composition-list').textContent = good.nutritionFacts.contents;
 
   return cardElement;
@@ -226,5 +224,46 @@ for (var i = 0; i < goods.length; i++) {
 
 catalogCardsContainer.appendChild(fragment);
 
+// Создаем массив товара, добавленного в корзину
+
+var goodsInCart = getGoodsList(3);
+
+var cart = document.querySelector('.goods__cards');
+
+var cartTemplate = document.querySelector('#card-order')
+    .content
+    .querySelector('.goods_card');
+
+var renderCardInCart = function (good) {
+  var cardElement = cartTemplate.cloneNode(true);
+
+  cardElement.querySelector('.card-order__title').textContent = good.name;
+
+  cardElement.querySelector('.card-order__img').setAttribute('src', good.picture);
+  cardElement.querySelector('.card-order__img').setAttribute('alt', good.name);
+
+  cardElement.querySelector('.card-order__price').textContent = good.price + ' ₽';
+
+  return cardElement;
+};
+
+// Создаем фрагмент
+
+var fragment2 = document.createDocumentFragment();
+
+// Вставляем во фрагмент элементы
+
+for (var j = 0; j < goodsInCart.length; j++) {
+  fragment2.appendChild(renderCardInCart(goodsInCart[j]));
+}
+
+// Вставляем фрагмент
+
+cart.appendChild(fragment2);
+
+cart.classList.remove('goods__cards--empty');
+
+var emptyCart = document.querySelector('.goods__card-empty');
+emptyCart.classList.add('visually-hidden');
 
 
