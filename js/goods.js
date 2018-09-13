@@ -137,9 +137,9 @@ var goods = getGoodsList(26);
 // Скрываем блок и текст Данные загружаются
 
 var catalogCards = document.querySelector('.catalog__cards');
-catalogCards.classList.remove('catalog__cards--load');
+//catalogCards.classList.remove('catalog__cards--load');
 var catalogLoad = document.querySelector('.catalog__load');
-catalogLoad.classList.add('visually-hidden');
+//catalogLoad.classList.add('visually-hidden');
 
 // Находим и сохраняем в переменную каталог товаров
 
@@ -222,7 +222,7 @@ for (var i = 0; i < goods.length; i++) {
 
 // Вставляем фрагмент
 
-catalogCardsContainer.appendChild(fragment);
+//catalogCardsContainer.appendChild(fragment);
 
 // Создаем массив товара, добавленного в корзину
 
@@ -259,11 +259,11 @@ for (var j = 0; j < goodsInCart.length; j++) {
 
 // Вставляем фрагмент
 
-cart.appendChild(fragment2);
+//cart.appendChild(fragment2);
 
-cart.classList.remove('goods__cards--empty');
+//cart.classList.remove('goods__cards--empty');
 
 var emptyCart = document.querySelector('.goods__card-empty');
-emptyCart.classList.add('visually-hidden');
+//emptyCart.classList.add('visually-hidden');
 
 
