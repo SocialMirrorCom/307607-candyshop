@@ -265,5 +265,3 @@ cart.classList.remove('goods__cards--empty');
 
 var emptyCart = document.querySelector('.goods__card-empty');
 emptyCart.classList.add('visually-hidden');
-
-
