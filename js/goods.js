@@ -136,14 +136,14 @@ var goods = getGoodsList(26);
 
 // Скрываем блок и текст Данные загружаются
 
-var catalogCards = document.querySelector('.catalog__cards');
-catalogCards.classList.remove('catalog__cards--load');
-var catalogLoad = document.querySelector('.catalog__load');
-catalogLoad.classList.add('visually-hidden');
+// var catalogCards = document.querySelector('.catalog__cards');
+// catalogCards.classList.remove('catalog__cards--load');
+// var catalogLoad = document.querySelector('.catalog__load');
+// catalogLoad.classList.add('visually-hidden');
 
 // Находим и сохраняем в переменную каталог товаров
 
-var catalogCardsContainer = document.querySelector('.catalog__cards');
+// var catalogCardsContainer = document.querySelector('.catalog__cards');
 
 // Находим и сохраняем в переменную шаблон карточки товара
 
@@ -222,13 +222,13 @@ for (var i = 0; i < goods.length; i++) {
 
 // Вставляем фрагмент
 
-catalogCardsContainer.appendChild(fragment);
+// catalogCardsContainer.appendChild(fragment);
 
 // Создаем массив товара, добавленного в корзину
 
 var goodsInCart = getGoodsList(3);
 
-var cart = document.querySelector('.goods__cards');
+// var cart = document.querySelector('.goods__cards');
 
 var cartTemplate = document.querySelector('#card-order')
     .content
@@ -259,11 +259,10 @@ for (var j = 0; j < goodsInCart.length; j++) {
 
 // Вставляем фрагмент
 
-cart.appendChild(fragment2);
+// cart.appendChild(fragment2);
 
-cart.classList.remove('goods__cards--empty');
+// cart.classList.remove('goods__cards--empty');
 
-var emptyCart = document.querySelector('.goods__card-empty');
-emptyCart.classList.add('visually-hidden');
-
+// var emptyCart = document.querySelector('.goods__card-empty');
+// emptyCart.classList.add('visually-hidden');
 
