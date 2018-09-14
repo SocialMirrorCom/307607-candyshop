@@ -266,4 +266,3 @@ for (var j = 0; j < goodsInCart.length; j++) {
 // var emptyCart = document.querySelector('.goods__card-empty');
 // emptyCart.classList.add('visually-hidden');
 
-
