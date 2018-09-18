@@ -335,21 +335,27 @@ var cardNumberValue = cardNumderInput.value;
 
 // Алгоритм Луна для обработки введенных данных карты
 
-var luhn = function (cardNumberValue) {
-    var arr = cardNumberValue.split('').map(function(char, index) {
-        var digit = parseInt(char);
-
-        if ((index + cardNumberValue.length) % 2 === 0) {
-            var digitX2 = digit * 2;
-
-            return digitX2 > 9 ? digitX2 - 9 : digitX2;
-        }
-
-        return digit;
-    });
-
-    return !(arr.reduce(function (a, b) { return a + b }, 0) % 10);
+var moonAlgorythm = function (cardNumber) {
+  var arr = cardNumber.split(''); // turn string into arrey
+  var sum = 0;
+  for (var i = 0; i < arr.length; i++) {
+    arr[i] = parseInt(arr[i], 10);
+    if (i % 2 === 0) {
+      arr[i] *= 2;
+    } else {
+        arr[i];
+      }
+      if (arr[i] >= 10) {
+      arr[i] -= 9;
+      } else {
+      arr[i];
+      }
+      sum += arr[i];
+  }
+  return sum % 10 === 0;
 };
+
+moonAlgorythm(cardNumber);
 
 // Кастомизируем события в случае некорректно введенных данных
 
@@ -464,7 +470,6 @@ cardHolderInput.addEventListener('input', function (evt) {
 });
 
 var cardStatus = paymentCardForm.querySelector('.payment__card-status');
-
 
 
 if (cardNumderInput.checkValidity() && cardDateInput.checkValidity() && cardCvcInput.checkValidity() && cardHolderInput.checkValidity()) {
