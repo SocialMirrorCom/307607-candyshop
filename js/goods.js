@@ -136,10 +136,10 @@ var goods = getGoodsList(26);
 
 // Скрываем блок и текст Данные загружаются
 
-/*var catalogCards = document.querySelector('.catalog__cards');
+var catalogCards = document.querySelector('.catalog__cards');
 catalogCards.classList.remove('catalog__cards--load');
 var catalogLoad = document.querySelector('.catalog__load');
-catalogLoad.classList.add('visually-hidden');*/
+catalogLoad.classList.add('visually-hidden');
 
 // Находим и сохраняем в переменную каталог товаров
 
@@ -222,7 +222,7 @@ for (var i = 0; i < goods.length; i++) {
 
 // Вставляем фрагмент
 
-//catalogCardsContainer.appendChild(fragment);
+catalogCardsContainer.appendChild(fragment);
 
 // Создаем массив товара, добавленного в корзину
 
@@ -243,6 +243,7 @@ var renderCardInCart = function (good) {
   cardElement.querySelector('.card-order__img').setAttribute('alt', good.name);
 
   cardElement.querySelector('.card-order__price').textContent = good.price + ' ₽';
+  cardElement.querySelector('.card-order__count').value = good.orderedAmount;
 
   return cardElement;
 };
@@ -259,46 +260,80 @@ for (var j = 0; j < goodsInCart.length; j++) {
 
 // Вставляем фрагмент
 
-//cart.appendChild(fragment2);
+// cart.appendChild(fragment2);
 
-//cart.classList.remove('goods__cards--empty');
+cart.classList.remove('goods__cards--empty');
 
-/*var emptyCart = document.querySelector('.goods__card-empty');
-emptyCart.classList.add('visually-hidden');*/
+var emptyCart = document.querySelector('.goods__card-empty');
+emptyCart.classList.add('visually-hidden');
 
+// Добавление товара в избранное
 
+var cardFavorites = document.querySelectorAll('.card__btn-favorite');
 
-var nameInput = document.querySelector('input[name=name]');
+for (var i = 0; i < cardFavorites.length; i++) {
+  cardFavorites[i].addEventListener('click', function (evt) {
+    var currentTarget = evt.currentTarget;
+    currentTarget.classList.toggle('card__btn-favorite--selected');
+  });
+}
 
-nameInput.addEventListener('invalid', function () {
-  if (nameInput.validity.valueMissing) {
-    nameInput.setCustomValidity('Обязательное поле');
-  } else {
-    nameInput.setCustomValidity('');
-  }
-});
+// Добавление товара в корзину
 
+var cards = document.querySelectorAll('.catalog__card');
+var currentCartArrey = cart.querySelectorAll('.goods_card');
 
-var telInput = document.querySelector('input[name=tel]');
+for (var i = 0; i < cards.length; i++) {
+  cards[i].addEventListener('click', function (evt) {
+    var currentProduct = evt.currentTarget;
+    var currentProductName = currentProduct.querySelector('.card__title').textContent;
+    for (var i = 0; i < goods.length; i++) {
+      if (goods[i].name === currentProductName) {
+        currentProduct = goods[i];
+      }
+    }
+    var addedProduct = Object.assign({}, currentProduct, {
+      orderedAmount: 1
+    });
+    delete addedProduct.nutritionFacts;
+    delete addedProduct.rating;
+    delete addedProduct.weight;
+    delete addedProduct.amount;
 
-telInput.addEventListener('invalid', function () {
-  if (telInput.validity.valueMissing) {
-    telInput.setCustomValidity('Обязательное поле');
-  } else {
-    telInput.setCustomValidity('');
-  }
-});
+    currentCartArrey = cart.querySelectorAll('.goods_card');
+    if (currentCartArrey.length > 0) {
+      for (var i = 0; i < currentCartArrey.length; i++) {
+        var repetedElement = 0;
+        if (currentCartArrey[i].querySelector('.card-order__title').innerHTML === addedProduct.name) {
+          addedProduct.orderedAmount = currentCartArrey[i].querySelector('.card-order__count').value;
+          addedProduct.orderedAmount = parseInt(addedProduct.orderedAmount, 10);
+          addedProduct.orderedAmount += 1;
+          if (currentProduct.amount >= 1) {
+            currentCartArrey[i].querySelector('.card-order__count').value = addedProduct.orderedAmount;
+            repetedElement += 1;
+            break;
+          }
+        }
+      }
+    }
 
-var emailInput = document.querySelector('input[name=email]');
+    if (currentCartArrey.length === 0 || !!repetedElement === false) {
+      if (currentProduct.amount >= addedProduct.orderedAmount) {
+        cart.appendChild(renderCardInCart(addedProduct));
+      }
+    }
 
-emailInput.addEventListener('invalid', function () {
-  if (emailInput.validity.patternMismatch) {
-    emailInput.setCustomValidity('Пожалуйста введите электронный адрес по образцу inanov@mail.ru');
-  } else {
-    emailInput.setCustomValidity('');
-  }
-});
+    currentProduct.amount--;
 
+    var cartMessage = document.querySelector('.main-header__basket');
+    currentCartArrey = cart.querySelectorAll('.goods_card');
+    if (currentCartArrey.length === 0) {
+      cartMessage.textContent = 'В корзине ничего нет';
+    } else {
+      cartMessage.textContent = 'В корзине есть товар';
+    }
+  });
+}
 
 // Выбор формы оплаты заказа
 
@@ -307,16 +342,31 @@ var inputCash = document.querySelector('input[value=cash]');
 var paymentCardForm = document.querySelector('.payment__card-wrap');
 var paymentCashAlarm = document.querySelector('.payment__cash-wrap');
 
+// Функция, которая создает массив инпутов в форме и устанавливает им атрибуты disabled
+
+var setDisabledAttribute = function (form) {
+  var inputsArrey = form.querySelectorAll('input');
+  for (var i = 0; i < inputsArrey.length; i++) {
+    inputsArrey[i].setAttribute('disabled', 'disabled');
+  }
+};
+
+// Функция, которая создает массив инпутов в форме и удаляет им атрибуты disabled
+
+var removeDisabledAttribute = function (form) {
+  var inputsArrey = form.querySelectorAll('input');
+  for (var i = 0; i < inputsArrey.length; i++) {
+    inputsArrey[i].removeAttribute('disabled', 'disabled');
+  }
+};
+
 // Если выбрана оплата наличными, то скрываем форму для внесения данных карты и блокируем ее, чтобы данные не отправлялись на сервер
 // Открывает предупреждение
 
 inputCash.addEventListener('click', function () {
   paymentCashAlarm.classList.remove('visually-hidden');
   paymentCardForm.classList.add('visually-hidden');
-  paymentCardForm.querySelectorAll('input[name=card-number]').setAttribute('disabled', 'disabled');
-  paymentCardForm.querySelectorAll('#payment__card-date').setAttribute('disabled', 'disabled');
-  paymentCardForm.querySelectorAll('#payment__card-cvc').setAttribute('disabled', 'disabled');
-  paymentCardForm.querySelectorAll('#payment__cardholder').setAttribute('disabled', 'disabled');
+  setDisabledAttribute(paymentCardForm);
 });
 
 // Если выбрана оплата картой, то показываем форму внесения номера карты
@@ -324,14 +374,12 @@ inputCash.addEventListener('click', function () {
 inputCard.addEventListener('click', function () {
   paymentCashAlarm.classList.add('visually-hidden');
   paymentCardForm.classList.remove('visually-hidden');
+  removeDisabledAttribute(paymentCardForm);
 });
-
-
-var cardNumderInput = paymentCardForm.querySelector('input[name=card-number]');
 
 // Получаем номер карты
 
-var cardNumberValue = cardNumderInput.value;
+var cardNumderInputValue = paymentCardForm.querySelector('input[name=card-number]').value;
 
 // Алгоритм Луна для обработки введенных данных карты
 
@@ -343,245 +391,56 @@ var moonAlgorythm = function (cardNumber) {
     if (i % 2 === 0) {
       arr[i] *= 2;
     } else {
-        arr[i];
-      }
-      if (arr[i] >= 10) {
-      arr[i] -= 9;
-      } else {
       arr[i];
-      }
-      sum += arr[i];
+    }
+    if (arr[i] >= 10) {
+    arr[i] -= 9;
+    } else {
+      arr[i];
+    }
+    sum += arr[i];
   }
   return sum % 10 === 0;
 };
 
-moonAlgorythm(cardNumber);
-
-// Кастомизируем события в случае некорректно введенных данных
-
-cardNumderInput.addEventListener('invalid', function () {
-  if (cardNumderInput.validity.tooShort) {
-    cardNumderInput.setCustomValidity('Номер карты должен состоять из 16-ти цифр.');
-  } else if (cardNumderInput.validity.tooLong) {
-    cardNumderInput.setCustomValidity('Номер карты должен состоять из 16-ти цифр.');
-  } else if (cardNumderInput.validity.valueMissing) {
-    cardNumderInput.setCustomValidity('Обязательное поле');
-  } else if (cardNumderInput.validity.patternMismatch) {
-    cardNumderInput.setCustomValidity('Номер карты должен состоять из 16-ти цифр, введенных без пробела.');
-  } else {
-    cardNumderInput.setCustomValidity('');
-  }
-});
-
-// Без понятия что тут делаем и зачем, узнать
-
-cardNumderInput.addEventListener('input', function (evt) {
-  var target = evt.target;
-  if (target.value.length < 16) {
-    target.setCustomValidity('Номер карты должен состоять из 16-ти цифр.');
-  } else {
-    target.setCustomValidity('');
-  }
-});
-
-var cardDateInput = paymentCardForm.querySelector('#payment__card-date');
-
-// Кастомизируем события в случае некорректно введенных данных
-
-cardDateInput.addEventListener('invalid', function () {
-  if (cardDateInput.validity.tooShort) {
-    cardDateInput.setCustomValidity('Введите пожалуйста месяц и год окончания действия карты по образцу.');
-  } else if (cardDateInput.validity.tooLong) {
-    cardDateInput.setCustomValidity('Введите пожалуйста месяц и год окончания действия карты по образцу.');
-  } else if (cardDateInput.validity.valueMissing) {
-    cardDateInput.setCustomValidity('Обязательное поле');
-  } else if (cardDateInput.validity.patternMismatch) {
-    cardDateInput.setCustomValidity('Введите пожалуйста месяц и год окончания действия карты по образцу.');
-  } else {
-    cardDateInput.setCustomValidity('');
-  }
-});
-
-// Без понятия что тут делаем и зачем, узнать
-
-cardDateInput.addEventListener('input', function (evt) {
-  var target = evt.target;
-  if (target.value.length < 5) {
-    target.setCustomValidity('Введите пожалуйста месяц и год окончания действия карты по образцу.');
-  } else {
-    target.setCustomValidity('');
-  }
-});
-
-var cardCvcInput = paymentCardForm.querySelector('#payment__card-cvc');
-
-// Кастомизируем события в случае некорректно введенных данных
-
-cardCvcInput.addEventListener('invalid', function () {
-  if (cardCvcInput.validity.tooShort) {
-    cardCvcInput.setCustomValidity('Введите пожалуйста CVC номер вашей карты - 3 цифры.');
-  } else if (cardCvcInput.validity.tooLong) {
-    cardCvcInput.setCustomValidity('Введите пожалуйста CVC номер вашей карты - 3 цифры.');
-  } else if (cardCvcInput.validity.valueMissing) {
-    cardCvcInput.setCustomValidity('Обязательное поле');
-  } else if (cardCvcInput.validity.patternMismatch) {
-    cardCvcInput.setCustomValidity('Введите пожалуйста CVC номер вашей карты - 3 цифры.');
-  } else {
-    cardCvcInput.setCustomValidity('');
-  }
-});
-
-// Без понятия что тут делаем и зачем, узнать
-
-cardCvcInput.addEventListener('input', function (evt) {
-  var target = evt.target;
-  if (target.value.length < 3) {
-    target.setCustomValidity('Введите пожалуйста CVC номер вашей карты - 3 цифры.');
-  } else {
-    target.setCustomValidity('');
-  }
-});
-
-var cardHolderInput = paymentCardForm.querySelector('#payment__cardholder');
-
-// Кастомизируем события в случае некорректно введенных данных
-
-cardHolderInput.addEventListener('invalid', function () {
-  if (cardHolderInput.validity.tooShort) {
-    cardHolderInput.setCustomValidity('Введите пожалуйста ваше имя и фамилию в том виде, как они указаны на карте.');
-  } else if (cardHolderInput.validity.tooLong) {
-    cardHolderInput.setCustomValidity('Введите пожалуйста ваше имя и фамилию в том виде, как они указаны на карте.');
-  } else if (cardHolderInput.validity.valueMissing) {
-    cardHolderInput.setCustomValidity('Обязательное поле');
-  } else {
-    cardHolderInput.setCustomValidity('');
-  }
-});
-
-// Без понятия что тут делаем и зачем, узнать
-
-cardHolderInput.addEventListener('input', function (evt) {
-  var target = evt.target;
-  if (target.value.length < 35) {
-    target.setCustomValidity('Введите пожалуйста ваше имя и фамилию в том виде, как они указаны на карте.');
-  } else {
-    target.setCustomValidity('');
-  }
-});
-
-var cardStatus = paymentCardForm.querySelector('.payment__card-status');
-
-
-if (cardNumderInput.checkValidity() && cardDateInput.checkValidity() && cardCvcInput.checkValidity() && cardHolderInput.checkValidity()) {
-  cardStatus.textContent = 'Одобрен';
-} else {
-  cardStatus.textContent = 'Не определен';
-}
-
-
-/*function CustomValidation() { } luhn(cardNumberValue) &&
-
-CustomValidation.prototype = {
-  // Установим пустой массив сообщений об ошибках
-  invalidities: [],
-
-  // Метод, проверяющий валидность
-  checkValidity: function(input) {
-
-    var validity = input.validity;
-
-    if (validity.patternMismatch) {
-      this.addInvalidity('Пожалуйста заполните ячейку согласно образцу.');
-    }
-
-    if (validity.rangeOverflow) {
-      var max = getAttributeValue(input, 'max');
-      this.addInvalidity('Максимальное количество знаков ' + max);
-    }
-
-    if (validity.rangeUnderflow) {
-      var min = getAttributeValue(input, 'min');
-      this.addInvalidity('Минимальное количество знаков ' + min);
-    }
-
-    if (validity.valueMissing) {
-      //var step = getAttributeValue(input, 'step');
-      this.addInvalidity('Обязательное поле');
-    }
-  },
-
-  // Добавляем сообщение об ошибке в массив ошибок
-  addInvalidity: function(message) {
-    this.invalidities.push(message);
-  },
-
-  // Получаем общий текст сообщений об ошибках
-  getInvalidities: function() {
-    return this.invalidities.join('. \n');
-  }
-};
-
-// Добавляем обработчик клика на кнопку отправки формы
-
-submit.addEventListener('click', function(e) {
-
-   //var inputs = document.querySelectorAll('input[type=text]');
-  // Пройдёмся по всем полям
-  for (var i = 0; i < inputs.length; i++) {
-
-    var input = inputs[i];
-
-    // Проверим валидность поля, используя встроенную в JavaScript функцию checkValidity()
-    if (input.checkValidity() == false) {
-
-      var inputCustomValidation = new CustomValidation(); // Создадим объект CustomValidation
-      inputCustomValidation.checkValidity(input); // Выявим ошибки
-      var customValidityMessage = inputCustomValidation.getInvalidities(); // Получим все сообщения об ошибках
-      input.setCustomValidity(customValidityMessage); // Установим специальное сообщение об ошибке
-
-    } // закончился if
-  } // закончился цикл
-});*/
-
-
 // Выбор способа доставки
 
-var inputDeliverCourier = document.querySelector('input[value=courier]');
-var inputDeliverStore = document.querySelector('input[value=store]');
 var deliverCourier = document.querySelector('.deliver__courier');
 var deliverStore = document.querySelector('.deliver__store');
 
-// Если выбрана доставка курьером, то открывается форма для заполнения адреса
+// Функция, открывает заказ доставки курьером, дезактивирует радио инпуты со списком магазинов
 
-inputDeliverCourier.addEventListener('click', function () {
+var openDeliveryCourier = function () {
   deliverCourier.classList.remove('visually-hidden');
   deliverStore.classList.add('visually-hidden');
-});
+  setDisabledAttribute(deliverStore);
+  removeDisabledAttribute(deliverCourier);
+  deliverCourier.querySelector('.deliver__textarea').removeAttribute('disabled', 'disabled');
+};
 
-// Если выбран самостоятельный забор, то открывается форма выбора станции метро, а форма для заполнения адреса получает статус не активная.
+// Функция, открывает список магазинов, дезактивирует инпуты формы заказа
 
-inputDeliverStore.addEventListener('click', function () {
-  deliverCourier.classList.add('visually-hidden');
+var openDeliveryStore = function () {
   deliverStore.classList.remove('visually-hidden');
-  //deliverCourier.querySelectorAll('input[type=radio]').setAttribute('disabled', 'disabled');
+  deliverCourier.classList.add('visually-hidden');
+  setDisabledAttribute(deliverCourier);
+  deliverCourier.querySelector('.deliver__textarea').setAttribute('disabled', 'disabled');
+  removeDisabledAttribute(deliverStore);
+};
+
+// Обработчик с делегированием
+
+document.addEventListener('click', function (evt) {
+  var target = evt.target;
+  if (target.id === 'deliver__courier') {
+    openDeliveryCourier();
+  }
+  if (target.id === 'deliver__store') {
+    openDeliveryStore();
+  }
 });
 
 // Выбор станции метро для забора покупки с смена карты
-
-// Массив с ссылками на изображение карты
-
-var mapsImages = [
-  'img/map/academicheskaya.jpg',
-  'img/map/chernishevskaya.jpg',
-  'img/map/frunzenskaya.jpg',
-  'img/map/petrogradskaya.jpg',
-  'img/map/proletarskaya.jpg',
-  'img/map/prosvesheniya.jpg',
-  'img/map/rechka.jpg',
-  'img/map/tehinstitute.jpg',
-  'img/map/vasileostrovskaya.jpg',
-  'img/map/vostaniya.jpg'
-];
 
 var mapImg = document.querySelector('.deliver__store-map-img');
 var mapAddress = document.querySelector('.deliver__store-describe');
@@ -646,48 +505,42 @@ document.querySelector('input[value=tehinstitute]').addEventListener('click', fu
   mapAddress.textContent = 'нет точного адреса';
 });
 
-var streetInput = document.querySelector('input[name=deliver-street]');
+// Перемещение ползунков фильтра
 
-streetInput.addEventListener('invalid', function () {
-  if (streetInput.validity.valueMissing) {
-    streetInput.setCustomValidity('Обязательное поле');
-  } else {
-    streetInput.setCustomValidity('');
-  }
+// Вешаем на каждый пин обработчик события
+// Получаем от ивент таргет координаты: ху пина и
+
+
+var range = document.querySelector('.range');
+var rangeFilter = range.querySelector('.range__filter');
+var rangeButtonLeft = rangeFilter.querySelector('.range__btn--left');
+var rangeButtonRight = rangeFilter.querySelector('.range__btn--right');
+var rangePriceMin = range.querySelector('.range__price--min');
+var rangePriceMax = range.querySelector('.range__price--max');
+
+var LEFT_START_POINT = 70;
+var RANGE_FILTER_LENGTH = 245;
+
+var getRangeProcent = function (dropCoords, rangePrice) {
+  var pointOnFilter = dropCoords.x - LEFT_START_POINT;
+  var procent = Math.round(pointOnFilter / RANGE_FILTER_LENGTH * 100);
+  rangePrice.textContent = procent;
+};
+
+rangeButtonLeft.addEventListener('mouseup', function (evtUp) {
+  var dropCoords = {
+    x: evtUp.clientX,
+    y: evtUp.clientY
+  };
+
+  getRangeProcent(dropCoords, rangePriceMin);
 });
 
-var houseInput = document.querySelector('input[name=deliver-house]');
+rangeButtonRight.addEventListener('mouseup', function (evtUp) {
+  var dropCoords = {
+    x: evtUp.clientX,
+    y: evtUp.clientY
+  };
 
-houseInput.addEventListener('invalid', function () {
-  if (houseInput.validity.valueMissing) {
-    houseInput.setCustomValidity('Обязательное поле');
-  } else {
-    houseInput.setCustomValidity('');
-  }
+  getRangeProcent(dropCoords, rangePriceMax);
 });
-
-var roomInput = document.querySelector('input[name=deliver-room]');
-
-roomInput.addEventListener('invalid', function () {
-  if (roomInput.validity.valueMissing) {
-    roomInput.setCustomValidity('Обязательное поле');
-  } else {
-    roomInput.setCustomValidity('');
-  }
-});
-
-var floorInput = document.querySelector('input[name=deliver-floor]');
-
-floorInput.addEventListener('invalid', function () {
-  if (floorInput.validity.patternMismatch) {
-    floorInput.setCustomValidity('Пожалуйста введите число');
-  } else {
-    floorInput.setCustomValidity('');
-  }
-});
-
-
-
-
-
-
