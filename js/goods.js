@@ -262,10 +262,20 @@ for (var j = 0; j < goodsInCart.length; j++) {
 
 // cart.appendChild(fragment2);
 
-cart.classList.remove('goods__cards--empty');
+var getCartRemoveAndAdd = function () {
+  cart.classList.remove('goods__cards--empty');
 
 var emptyCart = document.querySelector('.goods__card-empty');
 emptyCart.classList.add('visually-hidden');
+};
+
+getCartRemoveAndAdd();
+
+
+/*cart.classList.remove('goods__cards--empty');
+
+var emptyCart = document.querySelector('.goods__card-empty');
+emptyCart.classList.add('visually-hidden');*/
 
 // Добавление товара в избранное
 
@@ -379,12 +389,10 @@ inputCard.addEventListener('click', function () {
 
 // Получаем номер карты
 
-var cardNumderInputValue = paymentCardForm.querySelector('input[name=card-number]').value;
+var cardNumderInput = paymentCardForm.querySelector('input[name=card-number]');
 
-// Алгоритм Луна для обработки введенных данных карты
-
-var moonAlgorythm = function (cardNumber) {
-  var arr = cardNumber.split(''); // turn string into arrey
+var moonAlgorythm = function (inputValue) {
+  var arr = inputValue.split(''); // turn string into arrey
   var sum = 0;
   for (var i = 0; i < arr.length; i++) {
     arr[i] = parseInt(arr[i], 10);
@@ -394,7 +402,7 @@ var moonAlgorythm = function (cardNumber) {
       arr[i];
     }
     if (arr[i] >= 10) {
-    arr[i] -= 9;
+      arr[i] -= 9;
     } else {
       arr[i];
     }
@@ -402,6 +410,151 @@ var moonAlgorythm = function (cardNumber) {
   }
   return sum % 10 === 0;
 };
+
+var cardStatus = paymentCardForm.querySelector('.payment__card-status');
+
+/*cardNumderInput.addEventListener('input', function (evt) {
+  var target = evt.target;
+  var targetValue = target.value;
+  moonAlgorythm(targetValue);
+  if (!moonAlgorythm(targetValue)) {
+    target.setCustomValidity('Введите правильный номер карты.');
+
+  } else {
+    target.setCustomValidity('');
+}
+});*/
+
+
+      //cardStatus.textContent = 'Одобрен';
+
+     //cardStatus.textContent = 'Неизвестен';
+
+var form = document.querySelector('.form-order');
+console.log(form);
+var inputs = form.querySelectorAll('input');
+var submitBtn = form.querySelector('.buy__submit-btn');
+var floorNumber = form.querySelector('input[name=deliver-floor]');
+var cvcNumber = form.querySelector('input[name=card-cvc]');
+var cardDate = form.querySelector('input[name=card-date]');
+var emailValue = form.querySelector('input[name=email]');
+
+function CustomValidation() {}
+
+CustomValidation.prototype = {
+  // Установим пустой массив сообщений об ошибках
+  invalidities: [],
+
+  // Метод, проверяющий валидность
+  checkValidity: function(input) {
+
+    var validity = input.validity;
+
+    if (validity.patternMismatch) {
+      this.addInvalidity('Пожалуйста заполните поле по образцу');
+    }
+
+    if (validity.rangeOverflow) {
+      var max = getAttributeValue(input, 'maxlength');
+      this.addInvalidity('Максимальное количество знаков ' + max);
+    }
+
+    if (validity.rangeUnderflow) {
+      var min = getAttributeValue(input, 'minlength');
+      this.addInvalidity('Минимальное количество знаков ' + min);
+    }
+
+    if (validity.valueMissing) {
+      this.addInvalidity('Обязательное поле');
+    }
+
+    if (!moonAlgorythm(cardNumderInput.value)) {
+      console.log(cardNumderInput.value);
+      this.addInvalidity('Введите правильный номер');
+    }
+
+    /*if (!floorNumber.value.match(/^[ 0-9]+$/g)) {
+    this.addInvalidity('Введите этаж цифрой');
+    }
+
+    if (!cvcNumber.value.match(/[0-9]{3}/g)) {
+    this.addInvalidity('Введите 3 цифры, указанные на обороте вашей карты');
+    }
+
+    if (!cardDate.value.match(/[0-9]{2}\.[0-9]{2}/g)) {
+    this.addInvalidity('Введите дату по образцу');
+    }
+
+    if (!emailValue.value.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/g)) {
+    this.addInvalidity('Введите адрес электронной почты по образцу: someone@gmail.ru');
+    }*/
+
+  },
+
+  // Добавляем сообщение об ошибке в массив ошибок
+  addInvalidity: function(message) {
+    this.invalidities.push(message);
+  },
+
+  // Получаем общий текст сообщений об ошибках
+  getInvalidities: function() {
+    return this.invalidities.join('. \n');
+  },
+
+  // Сбросим общий текст сообщений об ошибках
+  resetInvalidity: function() {
+    return this.invalidities.length = 0;
+  }
+};
+
+// Добавляем обработчик клика на кнопку отправки формы
+
+submitBtn.addEventListener('click', function() {
+  // Пройдёмся по всем полям
+  for (var i = 0; i < inputs.length; i++) {
+
+    var input = inputs[i];
+
+    // Проверим валидность поля, используя встроенную в JavaScript функцию checkValidity()
+    if (input.checkValidity() == false) {
+
+      var inputCustomValidation = new CustomValidation(); // Создадим объект CustomValidation
+      inputCustomValidation.checkValidity(input); // Выявим ошибки
+      var customValidityMessage = inputCustomValidation.getInvalidities(); // Получим все сообщения об ошибках
+      input.setCustomValidity(customValidityMessage); // Установим специальное сообщение об ошибке
+      var resetCustomValidity = inputCustomValidation.resetInvalidity();
+
+
+    } // закончился if
+
+  } // закончился цикл
+
+
+});
+
+/*// Добавим обработчик потери фокуса инпутом в форме
+
+  // Пройдёмся по всем полям
+  for (var i = 0; i < inputs.length; i++) {
+
+    var input = inputs[i];
+    input.addEventListener('blur', function () {
+
+    // Проверим валидность поля, используя встроенную в JavaScript функцию checkValidity()
+    if (input.checkValidity() == false) {
+
+      var inputCustomValidation = new CustomValidation(); // Создадим объект CustomValidation
+      inputCustomValidation.checkValidity(input); // Выявим ошибки
+      var customValidityMessage = inputCustomValidation.getInvalidities(); // Получим все сообщения об ошибках
+      input.setCustomValidity(customValidityMessage); // Установим специальное сообщение об ошибке
+      var resetCustomValidity = inputCustomValidation.resetInvalidity();
+
+
+    } // закончился if
+
+  });
+}*/
+
 
 // Выбор способа доставки
 
