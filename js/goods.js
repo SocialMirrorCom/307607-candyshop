@@ -262,20 +262,17 @@ for (var j = 0; j < goodsInCart.length; j++) {
 
 // cart.appendChild(fragment2);
 
-var getCartRemoveAndAdd = function () {
-  cart.classList.remove('goods__cards--empty');
-
 var emptyCart = document.querySelector('.goods__card-empty');
-emptyCart.classList.add('visually-hidden');
+
+var removeCartMessage = function () {
+  cart.classList.remove('goods__cards--empty');
+  emptyCart.classList.add('visually-hidden');
 };
 
-getCartRemoveAndAdd();
-
-
-/*cart.classList.remove('goods__cards--empty');
-
-var emptyCart = document.querySelector('.goods__card-empty');
-emptyCart.classList.add('visually-hidden');*/
+var addCartMessage = function () {
+  cart.classList.add('goods__cards--empty');
+  emptyCart.classList.remove('visually-hidden');
+};
 
 // Добавление товара в избранное
 
@@ -293,6 +290,9 @@ for (var i = 0; i < cardFavorites.length; i++) {
 var cards = document.querySelectorAll('.catalog__card');
 var currentCartArrey = cart.querySelectorAll('.goods_card');
 
+// Сщздаем массив в который записываем добавляемые в корзину объекты
+
+
 for (var i = 0; i < cards.length; i++) {
   cards[i].addEventListener('click', function (evt) {
     var currentProduct = evt.currentTarget;
@@ -302,6 +302,7 @@ for (var i = 0; i < cards.length; i++) {
         currentProduct = goods[i];
       }
     }
+    console.log(currentProduct.amount);
     var addedProduct = Object.assign({}, currentProduct, {
       orderedAmount: 1
     });
@@ -310,15 +311,18 @@ for (var i = 0; i < cards.length; i++) {
     delete addedProduct.weight;
     delete addedProduct.amount;
 
+
+
     currentCartArrey = cart.querySelectorAll('.goods_card');
     if (currentCartArrey.length > 0) {
       for (var i = 0; i < currentCartArrey.length; i++) {
         var repetedElement = 0;
         if (currentCartArrey[i].querySelector('.card-order__title').innerHTML === addedProduct.name) {
-          addedProduct.orderedAmount = currentCartArrey[i].querySelector('.card-order__count').value;
-          addedProduct.orderedAmount = parseInt(addedProduct.orderedAmount, 10);
-          addedProduct.orderedAmount += 1;
+
           if (currentProduct.amount >= 1) {
+            addedProduct.orderedAmount = currentCartArrey[i].querySelector('.card-order__count').value;
+            addedProduct.orderedAmount = parseInt(addedProduct.orderedAmount, 10);
+            addedProduct.orderedAmount += 1;
             currentCartArrey[i].querySelector('.card-order__count').value = addedProduct.orderedAmount;
             repetedElement += 1;
             break;
@@ -330,10 +334,12 @@ for (var i = 0; i < cards.length; i++) {
     if (currentCartArrey.length === 0 || !!repetedElement === false) {
       if (currentProduct.amount >= addedProduct.orderedAmount) {
         cart.appendChild(renderCardInCart(addedProduct));
+        removeCartMessage();
       }
     }
 
     currentProduct.amount--;
+    console.log(currentProduct.amount);
 
     var cartMessage = document.querySelector('.main-header__basket');
     currentCartArrey = cart.querySelectorAll('.goods_card');
@@ -342,8 +348,70 @@ for (var i = 0; i < cards.length; i++) {
     } else {
       cartMessage.textContent = 'В корзине есть товар';
     }
+
+    // Удаление товара из корзины
+
+    currentCartArrey = cart.querySelectorAll('.goods_card');
+
+    for (var i = 0; i < currentCartArrey.length; i++) {
+      currentCartArrey[i].addEventListener('click', function (evt) {
+        var currentProductinCart = evt.currentTarget;
+      console.log(currentProductinCart);
+        var cardInCartClose = currentProductinCart.querySelector('.card-order__close');
+        var cardQuantityDecrease = currentProductinCart.querySelector('.card-order__btn--decrease');
+        var cardQuantityIncrease = currentProductinCart.querySelector('.card-order__btn--increase');
+
+        // Нажатие на кнопку card-order__btn--decrease уменьшает количество товара в корзине на единицу.
+        // Если до этого, в корзине находилась одна единица товара, товар удаляется из корзины.
+
+        if (evt.target === cardQuantityDecrease) {
+          console.log(evt.target);
+
+          var currentProductAmount = currentProductinCart.querySelector('.card-order__count').value;
+          currentProductAmount = parseInt(currentProductAmount, 10);
+          if (currentProductAmount >= 2) {
+          currentProductAmount -= 1;
+          currentProductinCart.querySelector('.card-order__count').value = currentProductAmount;
+          currentProduct.amount++;
+          console.log(currentProduct.amount);
+          } else {
+          cart.removeChild(currentProductinCart);
+          console.log(currentCartArrey);
+          addCartMessage();
+          currentProduct.amount += currentProductAmount;
+          console.log(currentProduct.amount);
+          }
+        }
+
+        // Нажатие на кнопку card-order__btn--increase увеличивает количество товара в корзине на единицу, в пределах изначального количества товара.
+
+        if (evt.target === cardQuantityIncrease) {
+          if (currentProduct.amount > 0) {
+          var currentProductAmount = currentProductinCart.querySelector('.card-order__count').value;
+          currentProductAmount = parseInt(currentProductAmount, 10);
+          currentProductAmount += 1;
+          currentProductinCart.querySelector('.card-order__count').value = currentProductAmount;
+          currentProduct.amount--;
+          console.log(currentProduct.amount);
+          }
+        }
+
+        // Удаляем продукт из корзины по нажатию на крестик, при удалении количество продукта пересчитывается
+
+        if (evt.target === cardInCartClose) {
+
+          cart.removeChild(currentProductinCart);
+          currentCartArrey = cart.querySelectorAll('.goods_card'); // удаляет но ругается, что удаляемый элемент не чайлд нода
+          console.log(currentCartArrey);
+          addCartMessage();
+          currentProduct.amount += parseInt(currentProductinCart.querySelector('.card-order__count').value, 10);
+          console.log(currentProduct.amount);
+        }
+      });
+    }
   });
 }
+
 
 // Выбор формы оплаты заказа
 
@@ -387,9 +455,33 @@ inputCard.addEventListener('click', function () {
   removeDisabledAttribute(paymentCardForm);
 });
 
-// Получаем номер карты
+// Валидация формы оформления заказа
+// Переменные
 
+var form = document.querySelector('.form-order');
+var inputs = form.querySelectorAll('input');
+var submitBtn = form.querySelector('.buy__submit-btn');
+var floorNumber = form.querySelector('input[name=deliver-floor]');
+var cvcNumber = paymentCardForm.querySelector('input[name=card-cvc]');
+var cardDate = paymentCardForm.querySelector('input[name=card-date]');
+var emailValue = form.querySelector('input[name=email]');
 var cardNumderInput = paymentCardForm.querySelector('input[name=card-number]');
+var cardName = paymentCardForm.querySelector('input[name=cardholder]');
+var cardStatus = paymentCardForm.querySelector('.payment__card-status');
+
+// Если в корзине нет ни одного товара, форма оформления заказа блокируется
+
+var getFormBlocked = function () {
+var currentCartArrey = cart.querySelectorAll('.goods_card');
+console.log(currentCartArrey);
+if (currentCartArrey.length === 0) {
+  setDisabledAttribute(form);
+  submitBtn.setAttribute('disabled', 'disabled');
+  }
+};
+getFormBlocked();
+
+// Алгоритм Луна
 
 var moonAlgorythm = function (inputValue) {
   var arr = inputValue.split(''); // turn string into arrey
@@ -411,33 +503,36 @@ var moonAlgorythm = function (inputValue) {
   return sum % 10 === 0;
 };
 
-var cardStatus = paymentCardForm.querySelector('.payment__card-status');
+var valid = {
+  cardNumderInput: false,
+  cardDate: false,
+  cvcNumber: false,
+  cardName: false
+};
 
-/*cardNumderInput.addEventListener('input', function (evt) {
-  var target = evt.target;
-  var targetValue = target.value;
-  moonAlgorythm(targetValue);
-  if (!moonAlgorythm(targetValue)) {
-    target.setCustomValidity('Введите правильный номер карты.');
+// Определяем статус кредитной карты Одобрен/Не одобрен
 
-  } else {
-    target.setCustomValidity('');
-}
-});*/
+paymentCardForm.addEventListener('input', function(evt) {
+  if (evt.target === cardNumderInput) {
+    valid.cardNumderInput = moonAlgorythm(evt.target.value);
+    console.log(valid.cardNumderInput);
+  }
+  if (evt.target === cardDate) {
+    valid.cardDate = evt.target.checkValidity();
+    console.log(valid.cardDate);
+  }
+  if (evt.target === cvcNumber) {
+    valid.cvcNumber = evt.target.checkValidity();
+    console.log(valid.cvcNumber);
+  }
+  if (evt.target === cardName) {
+    valid.cardName = evt.target.checkValidity();
+    console.log(valid.cardName);
+  }
+  cardStatus.textContent = (valid.cardNumderInput && valid.cardDate && valid.cvcNumber && valid.cardName) ? 'одобрен' : 'не одобрен';
+});
 
-
-      //cardStatus.textContent = 'Одобрен';
-
-     //cardStatus.textContent = 'Неизвестен';
-
-var form = document.querySelector('.form-order');
-console.log(form);
-var inputs = form.querySelectorAll('input');
-var submitBtn = form.querySelector('.buy__submit-btn');
-var floorNumber = form.querySelector('input[name=deliver-floor]');
-var cvcNumber = form.querySelector('input[name=card-cvc]');
-var cardDate = form.querySelector('input[name=card-date]');
-var emailValue = form.querySelector('input[name=email]');
+// Функция по кастомизации сообщений об ошибках
 
 function CustomValidation() {}
 
@@ -522,7 +617,7 @@ submitBtn.addEventListener('click', function() {
       inputCustomValidation.checkValidity(input); // Выявим ошибки
       var customValidityMessage = inputCustomValidation.getInvalidities(); // Получим все сообщения об ошибках
       input.setCustomValidity(customValidityMessage); // Установим специальное сообщение об ошибке
-      var resetCustomValidity = inputCustomValidation.resetInvalidity();
+      inputCustomValidation.resetInvalidity(); // Сбрасываем текст сообщения об ошибке
 
 
     } // закончился if
@@ -580,6 +675,14 @@ var openDeliveryStore = function () {
   deliverCourier.querySelector('.deliver__textarea').setAttribute('disabled', 'disabled');
   removeDisabledAttribute(deliverStore);
 };
+
+// Блокируем поля для курьерской доставки при загрузке формы (так как Клавиша Заеду выбрана по умолчанию)
+
+var deliverStoreInput = form.querySelector('input[value=store]');
+if (deliverStoreInput.checked) {
+  setDisabledAttribute(deliverCourier);
+  deliverCourier.querySelector('.deliver__textarea').setAttribute('disabled', 'disabled');
+}
 
 // Обработчик с делегированием
 
