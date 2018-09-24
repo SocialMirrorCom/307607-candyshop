@@ -285,13 +285,38 @@ for (var i = 0; i < cardFavorites.length; i++) {
   });
 }
 
+// Выбор формы оплаты заказа
+var form = document.querySelector('.form-order');
+var submitBtn = form.querySelector('.buy__submit-btn');
+var inputCard = document.querySelector('input[value=card]');
+var inputCash = document.querySelector('input[value=cash]');
+var paymentCardForm = document.querySelector('.payment__card-wrap');
+var paymentCashAlarm = document.querySelector('.payment__cash-wrap');
+
+// Функция, которая создает массив инпутов в форме и устанавливает им атрибуты disabled
+
+var setDisabledAttribute = function (form) {
+  var inputsArrey = form.querySelectorAll('input');
+  for (var i = 0; i < inputsArrey.length; i++) {
+    inputsArrey[i].setAttribute('disabled', 'disabled');
+  }
+};
+
+// Функция, которая создает массив инпутов в форме и удаляет им атрибуты disabled
+
+var removeDisabledAttribute = function (form) {
+  var inputsArrey = form.querySelectorAll('input');
+  for (var i = 0; i < inputsArrey.length; i++) {
+    inputsArrey[i].removeAttribute('disabled', 'disabled');
+  }
+};
+
 // Добавление товара в корзину
 
 var cards = document.querySelectorAll('.catalog__card');
 var currentCartArrey = cart.querySelectorAll('.goods_card');
 
-// Сщздаем массив в который записываем добавляемые в корзину объекты
-
+// Создаем массив в который записываем добавляемые в корзину объекты
 
 for (var i = 0; i < cards.length; i++) {
   cards[i].addEventListener('click', function (evt) {
@@ -335,6 +360,9 @@ for (var i = 0; i < cards.length; i++) {
       if (currentProduct.amount >= addedProduct.orderedAmount) {
         cart.appendChild(renderCardInCart(addedProduct));
         removeCartMessage();
+        removeDisabledAttribute(form);
+        submitBtn.removeAttribute('disabled', 'disabled');
+
       }
     }
 
@@ -413,30 +441,6 @@ for (var i = 0; i < cards.length; i++) {
 }
 
 
-// Выбор формы оплаты заказа
-
-var inputCard = document.querySelector('input[value=card]');
-var inputCash = document.querySelector('input[value=cash]');
-var paymentCardForm = document.querySelector('.payment__card-wrap');
-var paymentCashAlarm = document.querySelector('.payment__cash-wrap');
-
-// Функция, которая создает массив инпутов в форме и устанавливает им атрибуты disabled
-
-var setDisabledAttribute = function (form) {
-  var inputsArrey = form.querySelectorAll('input');
-  for (var i = 0; i < inputsArrey.length; i++) {
-    inputsArrey[i].setAttribute('disabled', 'disabled');
-  }
-};
-
-// Функция, которая создает массив инпутов в форме и удаляет им атрибуты disabled
-
-var removeDisabledAttribute = function (form) {
-  var inputsArrey = form.querySelectorAll('input');
-  for (var i = 0; i < inputsArrey.length; i++) {
-    inputsArrey[i].removeAttribute('disabled', 'disabled');
-  }
-};
 
 // Если выбрана оплата наличными, то скрываем форму для внесения данных карты и блокируем ее, чтобы данные не отправлялись на сервер
 // Открывает предупреждение
@@ -626,6 +630,20 @@ submitBtn.addEventListener('click', function() {
 
 
 });
+
+var name = document.getElementById('input[name=name]');
+
+var validate = function (input) {
+if (input.length === 0) {
+    input.setCustomValidity('Обязательное поле');
+    return false;
+} else {
+    input.setCustomValidity('');
+    return true;
+}
+};
+validate(name);
+
 
 /*// Добавим обработчик потери фокуса инпутом в форме
 
