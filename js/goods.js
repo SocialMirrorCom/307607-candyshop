@@ -361,6 +361,7 @@ for (var i = 0; i < cards.length; i++) {
         cart.appendChild(renderCardInCart(addedProduct));
         removeCartMessage();
         removeDisabledAttribute(form);
+        console.log(form.querySelector('input[id=deliver__store]'));
         submitBtn.removeAttribute('disabled', 'disabled');
 
       }
@@ -631,18 +632,6 @@ submitBtn.addEventListener('click', function() {
 
 });
 
-/*var name = document.getElementById('input[name=name]');
-
-var validate = function (input) {
-if (input.length === 0) {
-    input.setCustomValidity('Обязательное поле');
-    return false;
-} else {
-    input.setCustomValidity('');
-    return true;
-}
-};
-validate(name);*/
 
 
 /*// Добавим обработчик потери фокуса инпутом в форме
@@ -696,20 +685,25 @@ var openDeliveryStore = function () {
 
 // Блокируем поля для курьерской доставки при загрузке формы (так как Клавиша Заеду выбрана по умолчанию)
 
-var deliverStoreInput = form.querySelector('input[value=store]');
+
+
+var deliverStoreInput = form.querySelector('input[id=deliver__store]');
+/*console.log(deliverStoreInput);
 if (deliverStoreInput.checked) {
   setDisabledAttribute(deliverCourier);
   deliverCourier.querySelector('.deliver__textarea').setAttribute('disabled', 'disabled');
-}
+}*/
+
+
 
 // Обработчик с делегированием
 
-document.addEventListener('click', function (evt) {
+form.addEventListener('click', function (evt) {
   var target = evt.target;
   if (target.id === 'deliver__courier') {
     openDeliveryCourier();
   }
-  if (target.id === 'deliver__store') {
+  if (target.id === 'deliver__store' || deliverStoreInput.checked) {
     openDeliveryStore();
   }
 });
@@ -780,10 +774,6 @@ document.querySelector('input[value=tehinstitute]').addEventListener('click', fu
 });
 
 // Перемещение ползунков фильтра
-
-// Вешаем на каждый пин обработчик события
-// Получаем от ивент таргет координаты: ху пина и
-
 
 var range = document.querySelector('.range');
 var rangeFilter = range.querySelector('.range__filter');
