@@ -631,7 +631,7 @@ submitBtn.addEventListener('click', function() {
 
 });
 
-var name = document.getElementById('input[name=name]');
+/*var name = document.getElementById('input[name=name]');
 
 var validate = function (input) {
 if (input.length === 0) {
@@ -642,7 +642,7 @@ if (input.length === 0) {
     return true;
 }
 };
-validate(name);
+validate(name);*/
 
 
 /*// Добавим обработчик потери фокуса инпутом в форме
@@ -791,30 +791,44 @@ var rangeButtonLeft = rangeFilter.querySelector('.range__btn--left');
 var rangeButtonRight = rangeFilter.querySelector('.range__btn--right');
 var rangePriceMin = range.querySelector('.range__price--min');
 var rangePriceMax = range.querySelector('.range__price--max');
+var getCoords = function (evt) {
+  var coords = {
+    x: evt.clientX,
+    y: evt.clientY
+    };
+    return coords;
+};
 
-var LEFT_START_POINT = 70;
-var RANGE_FILTER_LENGTH = 245;
+rangeFilter.addEventListener('mouseup', function (evt) {
 
-var getRangeProcent = function (dropCoords, rangePrice) {
-  var pointOnFilter = dropCoords.x - LEFT_START_POINT;
-  var procent = Math.round(pointOnFilter / RANGE_FILTER_LENGTH * 100);
+  // Получаем ширину фильтра
+
+  var rangeFilterWidth = evt.currentTarget.offsetWidth;
+
+  // Получаем координаты полоски фильтра по отношению к HTML документу.
+
+  var currentTargetPosition  = {
+    top: evt.currentTarget.offsetTop,
+    left: evt.currentTarget.offsetLeft
+  }
+
+  // Функция, которая вычисляет процент в зависимости от позиции ползунка на фильтре при отпускании мыши
+
+  var getRangeProcent = function (dropCoords, rangePrice) {
+  var pointOnFilter = dropCoords.x - currentTargetPosition.left;
+  var procent = Math.round(pointOnFilter / rangeFilterWidth * 100);
   rangePrice.textContent = procent;
 };
 
-rangeButtonLeft.addEventListener('mouseup', function (evtUp) {
-  var dropCoords = {
-    x: evtUp.clientX,
-    y: evtUp.clientY
-  };
+// Если событие срабатывает на левом ползунке, определяем минимальную стоимость
 
-  getRangeProcent(dropCoords, rangePriceMin);
-});
+  if (evt.target === rangeButtonLeft) {
+    getRangeProcent(getCoords(evt), rangePriceMin);
+  }
 
-rangeButtonRight.addEventListener('mouseup', function (evtUp) {
-  var dropCoords = {
-    x: evtUp.clientX,
-    y: evtUp.clientY
-  };
+  // Если событие срабатывает на правом ползунке, определяем максимальную стоимость
 
-  getRangeProcent(dropCoords, rangePriceMax);
+  if (evt.target === rangeButtonRight) {
+    getRangeProcent(getCoords(evt), rangePriceMax);
+  }
 });
