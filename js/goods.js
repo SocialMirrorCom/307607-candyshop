@@ -888,11 +888,13 @@ var rangeFillLine = range.querySelector('.range__fill-line');
           newRight = leftEdge;
         }
 
+        var rangeFilterWidth = rangeFilter.offsetWidth;
+
         rangeButtonRight.style.left = newRight + 'px';
 
-        rangeFillLine.style.left = newRight + 'px';
+        rangeFillLine.style.right = (rangeFilterWidth - newRight) + 'px';
 
-        var rangeFilterWidth = rangeFilter.offsetWidth;
+
 
         var getRangeProcent = function (newSide, rangePrice) {
           var procent = Math.round(newSide / rangeFilterWidth * 100);
