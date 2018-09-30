@@ -280,6 +280,7 @@ var cardFavorites = document.querySelectorAll('.card__btn-favorite');
 
 for (var i = 0; i < cardFavorites.length; i++) {
   cardFavorites[i].addEventListener('click', function (evt) {
+    evt.preventDefault();
     var currentTarget = evt.currentTarget;
     currentTarget.classList.toggle('card__btn-favorite--selected');
   });
@@ -339,6 +340,7 @@ var getCartMessageinHeader = function (arrey) {
 
 for (var i = 0; i < cards.length; i++) {
   cards[i].addEventListener('click', function (evt) {
+    evt.preventDefault();
     var currentProduct = evt.currentTarget;
     var currentProductName = currentProduct.querySelector('.card__title').textContent;
     for (var i = 0; i < goods.length; i++) {
@@ -802,44 +804,131 @@ var rangeButtonLeft = rangeFilter.querySelector('.range__btn--left');
 var rangeButtonRight = rangeFilter.querySelector('.range__btn--right');
 var rangePriceMin = range.querySelector('.range__price--min');
 var rangePriceMax = range.querySelector('.range__price--max');
-var getCoords = function (evt) {
-  var coords = {
-    x: evt.clientX,
-    y: evt.clientY
+var rangeFillLine = range.querySelector('.range__fill-line');
+
+    rangeButtonLeft.onmousedown = function(event) {
+      event.preventDefault();
+
+      var shiftX = event.clientX - rangeButtonLeft.getBoundingClientRect().left;
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+
+      function onMouseMove(event) {
+        var newLeft = event.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+
+        if (newLeft < 0) {
+          newLeft = 0;
+        }
+        var rightEdge = rangeButtonRight.offsetLeft - rangeButtonRight.offsetWidth;
+
+        if (newLeft > rightEdge) {
+          newLeft = rightEdge;
+        }
+
+        rangeButtonLeft.style.left = newLeft + 'px';
+
+        rangeFillLine.style.left = newLeft + 'px';
+
+        var rangeFilterWidth = rangeFilter.offsetWidth;
+
+        var getRangeProcent = function (newSide, rangePrice) {
+          var procent = Math.round(newSide / rangeFilterWidth * 100);
+          rangePrice.textContent = procent;
+        };
+
+        getRangeProcent(newLeft, rangePriceMin);
+
+      }
+
+      function onMouseUp(event) {
+
+        var dropX = event.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+        if (dropX < 0) {
+          dropX = 0;
+        }
+        var rangeFilterWidth = rangeFilter.offsetWidth;
+
+        var getRangeProcent = function (newSide, rangePrice) {
+          var procent = Math.round(newSide / rangeFilterWidth * 100);
+          rangePrice.textContent = procent;
+        };
+
+        getRangeProcent(dropX, rangePriceMin);
+
+        document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener('mousemove', onMouseMove);
+      }
+
     };
-    return coords;
-};
 
-rangeFilter.addEventListener('mouseup', function (evt) {
+    rangeButtonLeft.ondragstart = function() {
+      return false;
+    };
 
-  // Получаем ширину фильтра
+    rangeButtonRight.onmousedown = function(event) {
+      event.preventDefault();
 
-  var rangeFilterWidth = evt.currentTarget.offsetWidth;
+      var shiftX = event.clientX - rangeButtonRight.getBoundingClientRect().left;
 
-  // Получаем координаты полоски фильтра по отношению к HTML документу.
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
 
-  var currentTargetPosition  = {
-    top: evt.currentTarget.offsetTop,
-    left: evt.currentTarget.offsetLeft
-  }
+      function onMouseMove(event) {
+        var newRight = event.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+        console.log(newRight);
 
-  // Функция, которая вычисляет процент в зависимости от позиции ползунка на фильтре при отпускании мыши
+        if (newRight < rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left) {
+          newRight = rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left;
+        }
+        console.log(rangeButtonLeft.getBoundingClientRect().right);
+        var leftEdge = rangeFilter.offsetWidth;
 
-  var getRangeProcent = function (dropCoords, rangePrice) {
-  var pointOnFilter = dropCoords.x - currentTargetPosition.left;
-  var procent = Math.round(pointOnFilter / rangeFilterWidth * 100);
-  rangePrice.textContent = procent;
-};
+        if (newRight > leftEdge) {
+          newRight = leftEdge;
+        }
 
-// Если событие срабатывает на левом ползунке, определяем минимальную стоимость
+        rangeButtonRight.style.left = newRight + 'px';
 
-  if (evt.target === rangeButtonLeft) {
-    getRangeProcent(getCoords(evt), rangePriceMin);
-  }
+        rangeFillLine.style.left = newRight + 'px';
 
-  // Если событие срабатывает на правом ползунке, определяем максимальную стоимость
+        var rangeFilterWidth = rangeFilter.offsetWidth;
 
-  if (evt.target === rangeButtonRight) {
-    getRangeProcent(getCoords(evt), rangePriceMax);
-  }
-});
+        var getRangeProcent = function (newSide, rangePrice) {
+          var procent = Math.round(newSide / rangeFilterWidth * 100);
+          rangePrice.textContent = procent;
+        };
+
+        getRangeProcent(newRight, rangePriceMax);
+
+      }
+
+      function onMouseUp(event) {
+
+        var dropX = event.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+        var rangeFilterWidth = rangeFilter.offsetWidth;
+
+        var leftEdge = rangeFilterWidth;
+
+        if (dropX > leftEdge) {
+          dropX = leftEdge;
+        }
+
+        var getRangeProcent = function (newSide, rangePrice) {
+          var procent = Math.round(newSide / rangeFilterWidth * 100);
+          rangePrice.textContent = procent;
+        };
+
+        getRangeProcent(dropX, rangePriceMax);
+
+        document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener('mousemove', onMouseMove);
+      }
+
+    };
+
+    rangeButtonRight.ondragstart = function() {
+      return false;
+    };
+
+
