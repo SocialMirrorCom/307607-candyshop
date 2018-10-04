@@ -837,10 +837,8 @@ var rangeFillLine = range.querySelector('.range__fill-line');
 
         rangeFillLine.style.left = newLeft + 'px';
 
-        var rangeFilterWidth = rangeFilter.offsetWidth;
-
         var getRangeProcent = function (newSide, rangePrice) {
-          var procent = Math.round(newSide / rangeFilterWidth * 100);
+          var procent = Math.round(newSide / rangeFilter.offsetWidth * 100);
           rangePrice.textContent = procent;
         };
 
@@ -854,10 +852,15 @@ var rangeFillLine = range.querySelector('.range__fill-line');
         if (dropX < 0) {
           dropX = 0;
         }
-        var rangeFilterWidth = rangeFilter.offsetWidth;
+
+        var rightEdge = rangeButtonRight.offsetLeft - rangeButtonRight.offsetWidth;
+
+        if (dropX > rightEdge) {
+          dropX = rightEdge;
+        }
 
         var getRangeProcent = function (newSide, rangePrice) {
-          var procent = Math.round(newSide / rangeFilterWidth * 100);
+          var procent = Math.round(newSide / rangeFilter.offsetWidth * 100);
           rangePrice.textContent = procent;
         };
 
@@ -877,33 +880,33 @@ var rangeFillLine = range.querySelector('.range__fill-line');
     rangeButtonRight.addEventListener('mousedown', function(evt) {
       evt.preventDefault();
 
-      var shiftX = evt.clientX - rangeButtonRight.getBoundingClientRect().left;
+      //var shiftX = evt.clientX - rangeButtonRight.getBoundingClientRect().left;
+      var shiftX = rangeButtonRight.getBoundingClientRect().right - evt.clientX;
 
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
 
       function onMouseMove(evt) {
-        var newRight = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+        //var newRight = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+        var newRight = evt.clientX + shiftX - rangeFilter.getBoundingClientRect().left;
         console.log(newRight);
 
         if (newRight < rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left) {
           newRight = rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left;
         }
         console.log(rangeButtonLeft.getBoundingClientRect().right);
-        var leftEdge = rangeFilter.offsetWidth;
+        var leftEdge = rangeFilter.offsetWidth - rangeButtonRight.offsetWidth;
 
         if (newRight > leftEdge) {
           newRight = leftEdge;
         }
 
-        var rangeFilterWidth = rangeFilter.offsetWidth;
-
         rangeButtonRight.style.left = newRight + 'px';
 
-        rangeFillLine.style.right = (rangeFilterWidth - newRight) + 'px';
+        rangeFillLine.style.right = (rangeFilter.offsetWidth - newRight) + 'px';
 
         var getRangeProcent = function (newSide, rangePrice) {
-          var procent = Math.round(newSide / rangeFilterWidth * 100);
+          var procent = Math.round(newSide / (rangeFilter.offsetWidth - rangeButtonRight.offsetWidth) * 100);
           rangePrice.textContent = procent;
         };
 
@@ -913,17 +916,20 @@ var rangeFillLine = range.querySelector('.range__fill-line');
 
       function onMouseUp(evt) {
 
-        var dropX = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
-        var rangeFilterWidth = rangeFilter.offsetWidth;
+        var dropX = evt.clientX + shiftX - rangeFilter.getBoundingClientRect().left;
+        //var dropX = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+        if (dropX < rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left) {
+          dropX = rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left;
+        }
 
-        var leftEdge = rangeFilterWidth;
+        var leftEdge = rangeFilter.offsetWidth - rangeButtonRight.offsetWidth;
 
         if (dropX > leftEdge) {
           dropX = leftEdge;
         }
 
         var getRangeProcent = function (newSide, rangePrice) {
-          var procent = Math.round(newSide / rangeFilterWidth * 100);
+          var procent = Math.round(newSide / (rangeFilter.offsetWidth - rangeButtonRight.offsetWidth) * 100);
           rangePrice.textContent = procent;
         };
 
