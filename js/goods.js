@@ -369,6 +369,7 @@ var createBasket = function(node, good) {
   cardElement.querySelector('.card-order__count').value = good.orderedAmount;
 
   cardElement.addEventListener("click", function(evt) {
+    evt.preventDefault();
 
     // Записываем в переменные активные элементы на карточке в корзине (удаление, уменьшение количества товара,
     // увеличесние количества товара)
@@ -379,13 +380,13 @@ var createBasket = function(node, good) {
 
     if (evt.target === cardQuantityDecrease) {
 
-    addedProductsList.forEach(function(item) {
+    addedProductsList.forEach(function(item, idx) {
       if (item.name === good.name) {
         if (good.orderedAmount >= 2) {
         good.orderedAmount -= 1;
         good.amount +=1;
         } else {
-          addedProductsList.splice(item, 1);
+          addedProductsList.splice(idx, 1);
           console.log(addedProductsList);
           good.amount += good.orderedAmount;
           good.orderedAmount = 0;
@@ -410,10 +411,10 @@ var createBasket = function(node, good) {
 
    if (evt.target === cardInCartClose) {
 
-    addedProductsList.forEach(function(item) {
+    addedProductsList.forEach(function(item, idx) {
 
       if (item.name === good.name) {
-        addedProductsList.splice(item, 1);
+        addedProductsList.splice(idx, 1);
         console.log(addedProductsList);
         good.amount += good.orderedAmount;
         good.orderedAmount = 0;
@@ -810,16 +811,18 @@ var rangePriceMin = range.querySelector('.range__price--min');
 var rangePriceMax = range.querySelector('.range__price--max');
 var rangeFillLine = range.querySelector('.range__fill-line');
 
-    rangeButtonLeft.onmousedown = function(event) {
-      event.preventDefault();
 
-      var shiftX = event.clientX - rangeButtonLeft.getBoundingClientRect().left;
+      rangeButtonLeft.addEventListener('mousedown', function(evt) {
+
+      evt.preventDefault();
+
+      var shiftX = evt.clientX - rangeButtonLeft.getBoundingClientRect().left;
 
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
 
-      function onMouseMove(event) {
-        var newLeft = event.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+      function onMouseMove(evt) {
+        var newLeft = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
 
         if (newLeft < 0) {
           newLeft = 0;
@@ -845,9 +848,9 @@ var rangeFillLine = range.querySelector('.range__fill-line');
 
       }
 
-      function onMouseUp(event) {
+      function onMouseUp(evt) {
 
-        var dropX = event.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+        var dropX = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
         if (dropX < 0) {
           dropX = 0;
         }
@@ -864,22 +867,23 @@ var rangeFillLine = range.querySelector('.range__fill-line');
         document.removeEventListener('mousemove', onMouseMove);
       }
 
-    };
+    });
 
     rangeButtonLeft.ondragstart = function() {
       return false;
     };
 
-    rangeButtonRight.onmousedown = function(event) {
-      event.preventDefault();
 
-      var shiftX = event.clientX - rangeButtonRight.getBoundingClientRect().left;
+    rangeButtonRight.addEventListener('mousedown', function(evt) {
+      evt.preventDefault();
+
+      var shiftX = evt.clientX - rangeButtonRight.getBoundingClientRect().left;
 
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
 
-      function onMouseMove(event) {
-        var newRight = event.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+      function onMouseMove(evt) {
+        var newRight = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
         console.log(newRight);
 
         if (newRight < rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left) {
@@ -907,9 +911,9 @@ var rangeFillLine = range.querySelector('.range__fill-line');
 
       }
 
-      function onMouseUp(event) {
+      function onMouseUp(evt) {
 
-        var dropX = event.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+        var dropX = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
         var rangeFilterWidth = rangeFilter.offsetWidth;
 
         var leftEdge = rangeFilterWidth;
@@ -929,7 +933,7 @@ var rangeFillLine = range.querySelector('.range__fill-line');
         document.removeEventListener('mousemove', onMouseMove);
       }
 
-    };
+    });
 
     rangeButtonRight.ondragstart = function() {
       return false;
