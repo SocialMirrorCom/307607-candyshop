@@ -880,14 +880,13 @@ var rangeFillLine = range.querySelector('.range__fill-line');
     rangeButtonRight.addEventListener('mousedown', function(evt) {
       evt.preventDefault();
 
-      //var shiftX = evt.clientX - rangeButtonRight.getBoundingClientRect().left;
       var shiftX = rangeButtonRight.getBoundingClientRect().right - evt.clientX;
 
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
 
       function onMouseMove(evt) {
-        //var newRight = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+
         var newRight = evt.clientX + shiftX - rangeFilter.getBoundingClientRect().left;
         console.log(newRight);
 
