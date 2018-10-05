@@ -1,8 +1,37 @@
 'use strict';
 (function () {
-  // Создаем массив из 26 объектов товара
+  // Загружаем с сервера массив из 28 объектов товара
 
-  var goods = window.data(26);
+  // Модальное окно ошибки
+
+  var modalError = document.querySelector('.modal--error');
+  var errorMessage = modalError.querySelector('.modal__message');
+  var modalErrorClose = modalError.querySelector('.modal__close');
+
+  var onModalClose = function (modal) {
+    modal.classList.add('modal--hidden');
+  };
+
+  var onModalOpen = function (modal) {
+    modal.classList.remove('modal--hidden');
+  };
+
+  var onError = function (message) {
+    console.error(message);
+    onModalOpen(modalError);
+    errorMessage.textContent = message;
+    modalErrorClose.addEventListener('click', function () {
+      onModalClose(modalError);
+    });
+  };
+
+  var goods = [];
+
+  var onLoad = function (data) {
+    return goods = data;
+    console.log(goods);
+  };
+
 
   // Находим и сохраняем в переменную каталог товаров
 
