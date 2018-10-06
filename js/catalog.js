@@ -7,6 +7,8 @@
   var modalError = document.querySelector('.modal--error');
   var errorMessage = modalError.querySelector('.modal__message');
   var modalErrorClose = modalError.querySelector('.modal__close');
+  var errorMessage2 = modalError.querySelector('p:last-child');
+  console.log(errorMessage2);
 
   var onModalClose = function (modal) {
     modal.classList.add('modal--hidden');
@@ -25,12 +27,21 @@
     });
   };
 
-  var goods = [];
-
   var onLoad = function (data) {
-    return goods = data;
-    console.log(goods);
+    console.log(data);
   };
+
+  var onErrorForm = function (message) {
+    console.error(message);
+    onModalOpen(modalError);
+    errorMessage.textContent = message;
+    errorMessage2.textContent = '';
+    modalErrorClose.addEventListener('click', function () {
+      onModalClose(modalError);
+    });
+  };
+
+  //var goods = window.data(26);
 
 
   // Находим и сохраняем в переменную каталог товаров
@@ -43,7 +54,7 @@
 
   // Корзина
 
-  window.cart = document.querySelector('.goods__cards');
+  var cart = document.querySelector('.goods__cards');
 
   // Находим и сохраняем в переменную шаблон карточки товара
 
@@ -139,8 +150,9 @@
 
     cardElement.querySelector('.card__title').textContent = good.name;
 
-    cardElement.querySelector('.card__img').setAttribute('src', good.picture);
+    cardElement.querySelector('.card__img').setAttribute('src', 'img/cards/' + good.picture);
     cardElement.querySelector('.card__img').setAttribute('alt', good.name);
+    //cardElement.querySelector('.card__img').innerHTML = '<img class="card__img" src="img/cards/' + good.picture + '" alt="' + good.name + '" width="265" height="264">';
 
     cardElement.querySelector('.card__price').innerHTML = good.price + '<span class="card__currency">₽</span><span class="card__weight">/' + good.weight + 'Г</span>';
 
@@ -205,7 +217,7 @@
     return cardElement;
   };
 
-  var renderCards = function () {
+  var renderCards = function (goods) {
 
   // Создаем фрагмент
 
@@ -214,6 +226,7 @@
   // Вставляем во фрагмент элементы
 
   for (var i = 0; i < goods.length; i++) {
+    goods[i].orderedAmount = 0;
     fragment.appendChild(renderCard(similarCardTemplate, goods[i]));
   }
 
@@ -221,6 +234,26 @@
 
   catalogCardsContainer.appendChild(fragment);
 
+  };
+
+  //window.load(renderCards, onError);
+
+  // Модальное окно успешной отправки формы
+
+  var modalSuccess = document.querySelector('.modal--success');
+  var modalSuccessClose = modalSuccess.querySelector('.modal__close');
+  var form = document.querySelector('.form-order');
+  var submitBtn = form.querySelector('.buy__submit-btn');
+
+  // Функция, которая очищает корзину
+
+  var getClearForm = function (form) {
+    cart.innerHTML = '';
+    var inputs = form.querySelectorAll('input');
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].value = '';
+    form.querySelector('.deliver__textarea').value = '';
+    }
   };
 
   // Template карточки товара в корзине
@@ -234,8 +267,9 @@
 
     cardElement.querySelector('.card-order__title').textContent = good.name;
 
-    cardElement.querySelector('.card-order__img').setAttribute('src', good.picture);
+    cardElement.querySelector('.card-order__img').setAttribute('src', 'img/cards/' + good.picture);
     cardElement.querySelector('.card-order__img').setAttribute('alt', good.name);
+    //cardElement.querySelector('.card-order__img').innerHTML = '<img src="img/cards/' + good.picture + '" alt="' + good.name + '" class="card-order__img" width="265" height="264">';
 
     cardElement.querySelector('.card-order__price').textContent = good.price + ' ₽';
     cardElement.querySelector('.card-order__count').value = good.orderedAmount;
@@ -294,9 +328,44 @@
       showTotal(addedProductsList);
       getCartMessageinHeader(addedProductsList);
       renderBasket();
+
     });
 
+    // Выводим сообщение об успешно отправленной форме и очищаем форму вместе с корзиной
+
+      form.addEventListener('submit', function (evt) {
+        evt.preventDefault();
+
+        window.save(new FormData(form), function (response) {
+          modalSuccess.classList.remove('modal--hidden');
+          modalSuccessClose.addEventListener('click', function() {
+            evt.preventDefault();
+            modalSuccess.classList.add('modal--hidden');
+            getClearForm(form);
+            addedProductsList.forEach(function(item, idx) {
+
+              if (item.name === good.name) {
+                addedProductsList.splice(idx, 1);
+                good.orderedAmount = 0;
+              }
+            showTotal(addedProductsList);
+            getCartMessageinHeader(addedProductsList);
+            });
+
+            // Не видит Инпут, выдает null
+
+            if (document.querySelector('input[value="cash"]').hasAttribute('checked', 'checked')) {
+              document.querySelector('input[value=cash]').removeAttribute('checked', 'checked');
+              document.querySelector('input[value=card]').setAttribute('checked', 'checked');
+              console.log(document.querySelector('input[value=card]'));
+            }
+          });
+        },
+        onErrorForm);
+      });
+
     return cardElement;
+
   };
 
   var renderBasket = function() {
@@ -316,15 +385,14 @@
 
     // Делаем форму заказа активной
 
-    var form = document.querySelector('.form-order');
-    var submitBtn = form.querySelector('.buy__submit-btn');
     removeDisabledAttribute(form);
     submitBtn.removeAttribute('disabled', 'disabled');
   };
 
    // Запускаем функцию и размещаем товар на сайте
 
-  renderCards();
+  //renderCards();
+  window.load(renderCards, onError);
 
   // Добавление товара в избранное
 

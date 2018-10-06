@@ -18,11 +18,6 @@
   var cardName = paymentCardForm.querySelector('input[name=cardholder]');
   var cardStatus = paymentCardForm.querySelector('.payment__card-status');
 
-  // Модальное окно успешной отправки формы
-
-  var modalSuccess = document.querySelector('.modal--success');
-  var modalSuccessClose = modalSuccess.querySelector('.modal__close');
-
   // Функция, которая создает массив инпутов в форме и устанавливает им атрибуты disabled
 
   var setDisabledAttribute = function (form) {
@@ -62,13 +57,13 @@
   // Если в корзине нет ни одного товара, форма оформления заказа блокируется
 
   var getFormBlocked = function () {
-  var currentCartArrey = window.cart.querySelectorAll('.goods_card');
-  console.log(currentCartArrey);
-  if (currentCartArrey.length === 0) {
-    setDisabledAttribute(form);
-    submitBtn.setAttribute('disabled', 'disabled');
-    }
-  };
+    var cart = document.querySelector('.goods__cards');
+    var currentCartArrey = cart.querySelectorAll('.goods_card');
+    if (currentCartArrey.length === 0) {
+      setDisabledAttribute(form);
+      submitBtn.setAttribute('disabled', 'disabled');
+      }
+    };
   getFormBlocked();
 
   // Алгоритм Луна
@@ -317,4 +312,5 @@
     mapImg.setAttribute('alt', 'Технологический институт');
     mapAddress.textContent = 'нет точного адреса';
   });
+
 })();

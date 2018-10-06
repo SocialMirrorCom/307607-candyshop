@@ -39,6 +39,16 @@
       onLoad(xhr.response);
     });
 
+    xhr.addEventListener('error', function () {
+      onError('Произошла ошибка соединения. Восстановите соединение и отправьте заказ еще раз.');
+    });
+
+    xhr.addEventListener('timeout', function () {
+      onError('Запрос не успел выполниться за ' + xhr.timeout + ' мс');
+    });
+
+    xhr.timeout = 10000; // 10s
+
     xhr.open('POST', URL);
     xhr.send(data);
   };
