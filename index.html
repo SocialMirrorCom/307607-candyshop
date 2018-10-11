@@ -229,7 +229,7 @@
                     </p>
 
                     <p class="text-input text-input--light payment__input-wrap payment__input-wrap--cvc">
-                      <input type="text" class="text-input__input" name="card-cvc" id="payment__card-cvc" placeholder="CVC" pattern="[0-9]{3}" minlength="3" maxlength="3" required>
+                      <input type="text" class="text-input__input" name="card-cvc" id="payment__card-cvc" placeholder="CVC" pattern="[1-9][0-9][0-9]" minlength="3" maxlength="3" required>
                       <label class="text-input__label text-input__label--lock" for="payment__card-cvc">CVC</label>
                     </p>
 
@@ -486,6 +486,7 @@
       <p>Попробуй ещё раз, нажав <span class="catalog__show-all" tabindex ="0">«Показать всё»</span> или посмотри что мы предлагаем тебе попробовать.</p>
     </div>
   </template>
+  <script src="js/close.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/backend.js"></script>
   <script src="js/data.js"></script>

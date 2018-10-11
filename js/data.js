@@ -129,11 +129,4 @@
     }
     return goodsList;
   };
-
-  // Скрываем блок и текст Данные загружаются
-
-  var catalogCards = document.querySelector('.catalog__cards');
-  catalogCards.classList.remove('catalog__cards--load');
-  var catalogLoad = document.querySelector('.catalog__load');
-  catalogLoad.classList.add('visually-hidden');
 })();
