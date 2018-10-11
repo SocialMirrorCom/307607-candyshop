@@ -453,9 +453,11 @@
         filteredList.push(current);
       }
 
-      if (isEmptyPopular || isExistPopular) {
+      // Ломает весь фильтр
+
+      /*if (isEmptyPopular || isExistPopular) {
         filteredList = items;
-      }
+      }*/
 
       if (isEmptyExpensiveFirst || isExistExpensiveFirst) {
         filteredList = getHigherPriceFirst(filteredList);
@@ -685,7 +687,6 @@
       return it.rating.value === 5;
     });
     rating5 = getHigherRatingNumberFirst(rating5);
-    console.log(rating5);
 
     var rating4 = arreyCopy.filter(function(it) {
       return it.rating.value === 4;
@@ -738,7 +739,8 @@
     } else if (activeFilters.expensiveFirst.indexOf(target) !== -1 && activeFilters.expensiveFirst.length === 1) {
       // если в фильтрах по типу есть таргет и он единственный в массиве, очищаем массив
       activeFilters.expensiveFirst = [];
-    } else if (activeFilters.expensiveFirst.indexOf(target) !== -1 && activeFilters.expensiveFirst.length > 1) {
+    }
+    /*else if (activeFilters.expensiveFirst.indexOf(target) !== -1 && activeFilters.expensiveFirst.length > 1) {
       // если в фильтрах есть таргет и длина массива больше 1, удаляем таргет из фильтров
       activeFilters.expensiveFirst = activeFilters.expensiveFirst.filter(function (item) {
         return item !== target;
@@ -746,7 +748,7 @@
     } else if (activeFilters.expensiveFirst.indexOf(target) === -1 && activeFilters.expensiveFirst.length > 0) {
       // если в фильтрах нет таргета, и длина массива с фильтрами больше 0, добавляем таргет в фильтры
       activeFilters.expensiveFirst.push(target);
-    }
+    }*/
     removeItems();
     applyFilters(items, target);
   });
@@ -763,7 +765,8 @@
     } else if (activeFilters.cheapFirst.indexOf(target) !== -1 && activeFilters.cheapFirst.length === 1) {
       // если в фильтрах по типу есть таргет и он единственный в массиве, очищаем массив
       activeFilters.cheapFirst = [];
-    } else if (activeFilters.cheapFirst.indexOf(target) !== -1 && activeFilters.cheapFirst.length > 1) {
+    }
+    /*else if (activeFilters.cheapFirst.indexOf(target) !== -1 && activeFilters.cheapFirst.length > 1) {
       // если в фильтрах есть таргет и длина массива больше 1, удаляем таргет из фильтров
       activeFilters.cheapFirst = activeFilters.cheapFirst.filter(function (item) {
         return item !== target;
@@ -771,7 +774,7 @@
     } else if (activeFilters.cheapFirst.indexOf(target) === -1 && activeFilters.cheapFirst.length > 0) {
       // если в фильтрах нет таргета, и длина массива с фильтрами больше 0, добавляем таргет в фильтры
       activeFilters.cheapFirst.push(target);
-    }
+    }*/
     removeItems();
     applyFilters(items, target);
   });
@@ -788,7 +791,8 @@
     } else if (activeFilters.foodRating.indexOf(target) !== -1 && activeFilters.foodRating.length === 1) {
       // если в фильтрах по типу есть таргет и он единственный в массиве, очищаем массив
       activeFilters.foodRating = [];
-    } else if (activeFilters.foodRating.indexOf(target) !== -1 && activeFilters.foodRating.length > 1) {
+    }
+    /*else if (activeFilters.foodRating.indexOf(target) !== -1 && activeFilters.foodRating.length > 1) {
       // если в фильтрах есть таргет и длина массива больше 1, удаляем таргет из фильтров
       activeFilters.foodRating = activeFilters.foodRating.filter(function (item) {
         return item !== target;
@@ -796,12 +800,12 @@
     } else if (activeFilters.foodRating.indexOf(target) === -1 && activeFilters.foodRating.length > 0) {
       // если в фильтрах нет таргета, и длина массива с фильтрами больше 0, добавляем таргет в фильтры
       activeFilters.foodRating.push(target);
-    }
+    }*/
     removeItems();
     applyFilters(items, target);
   });
 
-  var filterByPopular = window.utils.debounce(function (evt, items) {
+  /*var filterByPopular = window.utils.debounce(function (evt, items) {
     var target = evt.target.innerText;
     console.log('items', target);
     setCheckedOnFilter(evt.target);
@@ -822,7 +826,7 @@
     }
     removeItems();
     applyFilters(items, target);
-  });
+  });*/
 
 
   // Oбработчик на клик по фильтрам
@@ -841,8 +845,8 @@
       filterByFavorite(evt, goods);
     } else if (target === 'В наличии') {
       filterByAvailable(evt, goods);
-    } else if (target === 'Сначала популярные') {
-      filterByPopular(evt, goods);
+    //} else if (target === 'Сначала популярные') {
+      //filterByPopular(evt, goods);
     } else if (target === 'Сначала дорогие') {
       filterByExpensivePriceFirst(evt, goods);
     } else if (target === 'Сначала дешёвые') {
