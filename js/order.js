@@ -16,22 +16,13 @@
   var cardName = paymentCardForm.querySelector('input[name=cardholder]');
   var cardStatus = paymentCardForm.querySelector('.payment__card-status');
 
-  // Функция, которая создает массив инпутов в форме и устанавливает им атрибуты disabled
-
-  var setDisabledAttribute = function (form) {
-    var inputsArrey = form.querySelectorAll('input');
-    for (var i = 0; i < inputsArrey.length; i++) {
-      inputsArrey[i].setAttribute('disabled', 'disabled');
-    }
-  };
-
   // Если выбрана оплата наличными, то скрываем форму для внесения данных карты и блокируем ее, чтобы данные не отправлялись на сервер
   // Открывает предупреждение
 
   inputCash.addEventListener('click', function () {
     paymentCashAlarm.classList.remove('visually-hidden');
     paymentCardForm.classList.add('visually-hidden');
-    setDisabledAttribute(paymentCardForm);
+    window.setDisabledAttribute(paymentCardForm);
   });
 
   // Если выбрана оплата картой, то показываем форму внесения номера карты
@@ -49,7 +40,7 @@
     var cart = document.querySelector('.goods__cards');
     var currentCartArrey = cart.querySelectorAll('.goods_card');
     if (currentCartArrey.length === 0) {
-      setDisabledAttribute(formOrder);
+      window.setDisabledAttribute(formOrder);
       submitBtn.setAttribute('disabled', 'disabled');
     }
   };
@@ -181,7 +172,7 @@
   var openDeliveryCourier = function () {
     deliverCourier.classList.remove('visually-hidden');
     deliverStore.classList.add('visually-hidden');
-    setDisabledAttribute(deliverStore);
+    window.setDisabledAttribute(deliverStore);
     window.removeDisabledAttribute(deliverCourier);
     deliverCourier.querySelector('.deliver__textarea').removeAttribute('disabled', 'disabled');
   };
@@ -191,7 +182,7 @@
   var openDeliveryStore = function () {
     deliverStore.classList.remove('visually-hidden');
     deliverCourier.classList.add('visually-hidden');
-    setDisabledAttribute(deliverCourier);
+    window.setDisabledAttribute(deliverCourier);
     deliverCourier.querySelector('.deliver__textarea').setAttribute('disabled', 'disabled');
     window.removeDisabledAttribute(deliverStore);
   };

@@ -808,6 +808,9 @@
               good.amount += good.orderedAmount;
               good.orderedAmount = 0;
               cart.removeChild(evt.currentTarget);
+              putEmptyCartMessage();
+              window.setDisabledAttribute(formOrder);
+              submitBtn.setAttribute('disabled', 'disabled');
             }
           }
         });
@@ -831,13 +834,15 @@
             good.amount += good.orderedAmount;
             good.orderedAmount = 0;
             evt.currentTarget.remove();
+            putEmptyCartMessage();
+            window.setDisabledAttribute(formOrder);
+            submitBtn.setAttribute('disabled', 'disabled');
           }
         });
       }
       showTotal(addedProductsList);
       getCartMessageinHeader(addedProductsList);
       renderBasket();
-      putEmptyCartMessage();
     });
 
     // Закрытие сообщения об успешно отправленной форме Esc
@@ -860,28 +865,34 @@
       document.addEventListener('keydown', onModalSuccessEscPress);
     };
 
+    var oncloseModalSuccess = function () {
+      closeModalSuccess();
+      getClearForm(formOrder);
+      addedProductsList.forEach(function (item, idx) {
+        if (item.name === good.name) {
+          addedProductsList.splice(idx, 1);
+          good.orderedAmount = 0;
+        }
+        showTotal(addedProductsList);
+        getCartMessageinHeader(addedProductsList);
+        window.setDisabledAttribute(formOrder);
+      });
+    };
+
     // Выводим сообщение об успешно отправленной форме и очищаем форму вместе с корзиной
+
+    var onLoadModalSuccess = function () {
+      openModalSucces();
+    };
 
     formOrder.addEventListener('submit', function (evt) {
       evt.preventDefault();
-      window.save(new FormData(formOrder), function () {
-        openModalSucces();
-        modalSuccessClose.addEventListener('click', function () {
-          evt.preventDefault();
-          closeModalSuccess();
-          getClearForm(formOrder);
-          addedProductsList.forEach(function (item, idx) {
-            if (item.name === good.name) {
-              addedProductsList.splice(idx, 1);
-              good.orderedAmount = 0;
-            }
-            showTotal(addedProductsList);
-            getCartMessageinHeader(addedProductsList);
-          });
-        });
-      },
-      onErrorForm);
+      window.save(new FormData(formOrder), onLoadModalSuccess, onErrorForm);
     });
+
+    modalSuccessClose.addEventListener('click', oncloseModalSuccess);
+    modalSuccessClose.addEventListener('keydown', oncloseModalSuccess);
+
 
     return cardElement;
   };
