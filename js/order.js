@@ -111,12 +111,12 @@
       }
 
       if (validity.rangeOverflow) {
-        var max = getAttributeValue(input, 'maxlength');
+        var max = input.getAttribute('maxlength');
         this.addInvalidity('Максимальное количество знаков ' + max);
       }
 
       if (validity.rangeUnderflow) {
-        var min = getAttributeValue(input, 'minlength');
+        var min = input.getAttribute('minlength');
         this.addInvalidity('Минимальное количество знаков ' + min);
       }
 
@@ -141,7 +141,8 @@
 
     // Сбросим общий текст сообщений об ошибках
     resetInvalidity: function () {
-      return this.invalidities.length = 0;
+      this.invalidities.length = 0;
+      return this.invalidities.length;
     }
   };
 
