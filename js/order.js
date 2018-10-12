@@ -3,38 +3,18 @@
 
   // Выбор формы оплаты заказа
   // Переменные
-  var form = document.querySelector('.form-order');
-  var submitBtn = form.querySelector('.buy__submit-btn');
-  var inputCard = form.querySelector('input[value=card]');
-  var inputCash = form.querySelector('input[value=cash]');
-  var paymentCardForm = form.querySelector('.payment__card-wrap');
-  var paymentCashAlarm = form.querySelector('.payment__cash-wrap');
-  var inputs = form.querySelectorAll('input');
-  var floorNumber = form.querySelector('input[name=deliver-floor]');
+  var formOrder = document.querySelector('.form-order');
+  var submitBtn = formOrder.querySelector('.buy__submit-btn');
+  var inputCard = formOrder.querySelector('input[value=card]');
+  var inputCash = formOrder.querySelector('input[value=cash]');
+  var paymentCardForm = formOrder.querySelector('.payment__card-wrap');
+  var paymentCashAlarm = formOrder.querySelector('.payment__cash-wrap');
+  var inputs = formOrder.querySelectorAll('input');
   var cvcNumber = paymentCardForm.querySelector('input[name=card-cvc]');
   var cardDate = paymentCardForm.querySelector('input[name=card-date]');
-  var emailValue = form.querySelector('input[name=email]');
   var cardNumderInput = paymentCardForm.querySelector('input[name=card-number]');
   var cardName = paymentCardForm.querySelector('input[name=cardholder]');
   var cardStatus = paymentCardForm.querySelector('.payment__card-status');
-
-  // Функция, которая создает массив инпутов в форме и устанавливает им атрибуты disabled
-
-  var setDisabledAttribute = function (form) {
-    var inputsArrey = form.querySelectorAll('input');
-    for (var i = 0; i < inputsArrey.length; i++) {
-      inputsArrey[i].setAttribute('disabled', 'disabled');
-    }
-  };
-
-  // Функция, которая создает массив инпутов в форме и удаляет им атрибуты disabled
-
-  window.removeDisabledAttribute = function (form) {
-    var inputsArrey = form.querySelectorAll('input');
-    for (var i = 0; i < inputsArrey.length; i++) {
-      inputsArrey[i].removeAttribute('disabled', 'disabled');
-    }
-  };
 
   // Если выбрана оплата наличными, то скрываем форму для внесения данных карты и блокируем ее, чтобы данные не отправлялись на сервер
   // Открывает предупреждение
@@ -42,7 +22,7 @@
   inputCash.addEventListener('click', function () {
     paymentCashAlarm.classList.remove('visually-hidden');
     paymentCardForm.classList.add('visually-hidden');
-    setDisabledAttribute(paymentCardForm);
+    window.setDisabledAttribute(paymentCardForm);
   });
 
   // Если выбрана оплата картой, то показываем форму внесения номера карты
@@ -50,18 +30,18 @@
   inputCard.addEventListener('click', function () {
     paymentCashAlarm.classList.add('visually-hidden');
     paymentCardForm.classList.remove('visually-hidden');
-    removeDisabledAttribute(paymentCardForm);
+    window.removeDisabledAttribute(paymentCardForm);
   });
 
   // Валидация формы оформления заказа
   // Если в корзине нет ни одного товара, форма оформления заказа блокируется
 
   var getFormBlocked = function () {
-  var currentCartArrey = window.cart.querySelectorAll('.goods_card');
-  console.log(currentCartArrey);
-  if (currentCartArrey.length === 0) {
-    setDisabledAttribute(form);
-    submitBtn.setAttribute('disabled', 'disabled');
+    var cart = document.querySelector('.goods__cards');
+    var currentCartArrey = cart.querySelectorAll('.goods_card');
+    if (currentCartArrey.length === 0) {
+      window.setDisabledAttribute(formOrder);
+      submitBtn.setAttribute('disabled', 'disabled');
     }
   };
   getFormBlocked();
@@ -76,12 +56,12 @@
       if (i % 2 === 0) {
         arr[i] *= 2;
       } else {
-        arr[i];
+        arr[i] = arr[i];
       }
       if (arr[i] >= 10) {
         arr[i] -= 9;
       } else {
-        arr[i];
+        arr[i] = arr[i];
       }
       sum += arr[i];
     }
@@ -97,22 +77,18 @@
 
   // Определяем статус кредитной карты Одобрен/Не одобрен
 
-  paymentCardForm.addEventListener('input', function(evt) {
+  paymentCardForm.addEventListener('input', function (evt) {
     if (evt.target === cardNumderInput) {
       valid.cardNumderInput = moonAlgorythm(evt.target.value);
-      console.log(valid.cardNumderInput);
     }
     if (evt.target === cardDate) {
       valid.cardDate = evt.target.checkValidity();
-      console.log(valid.cardDate);
     }
     if (evt.target === cvcNumber) {
       valid.cvcNumber = evt.target.checkValidity();
-      console.log(valid.cvcNumber);
     }
     if (evt.target === cardName) {
       valid.cardName = evt.target.checkValidity();
-      console.log(valid.cardName);
     }
     cardStatus.textContent = (valid.cardNumderInput && valid.cardDate && valid.cvcNumber && valid.cardName) ? 'одобрен' : 'не одобрен';
   });
@@ -126,7 +102,7 @@
     invalidities: [],
 
     // Метод, проверяющий валидность
-    checkValidity: function(input) {
+    checkValidity: function (input) {
 
       var validity = input.validity;
 
@@ -135,12 +111,12 @@
       }
 
       if (validity.rangeOverflow) {
-        var max = getAttributeValue(input, 'maxlength');
+        var max = input.getAttribute('maxlength');
         this.addInvalidity('Максимальное количество знаков ' + max);
       }
 
       if (validity.rangeUnderflow) {
-        var min = getAttributeValue(input, 'minlength');
+        var min = input.getAttribute('minlength');
         this.addInvalidity('Минимальное количество знаков ' + min);
       }
 
@@ -149,55 +125,35 @@
       }
 
       if (!moonAlgorythm(cardNumderInput.value)) {
-        console.log(cardNumderInput.value);
         this.addInvalidity('Введите правильный номер');
       }
-
-      /*if (!floorNumber.value.match(/^[ 0-9]+$/g)) {
-      this.addInvalidity('Введите этаж цифрой');
-      }
-
-      if (!cvcNumber.value.match(/[0-9]{3}/g)) {
-      this.addInvalidity('Введите 3 цифры, указанные на обороте вашей карты');
-      }
-
-      if (!cardDate.value.match(/[0-9]{2}\.[0-9]{2}/g)) {
-      this.addInvalidity('Введите дату по образцу');
-      }
-
-      if (!emailValue.value.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/g)) {
-      this.addInvalidity('Введите адрес электронной почты по образцу: someone@gmail.ru');
-      }*/
-
     },
 
     // Добавляем сообщение об ошибке в массив ошибок
-    addInvalidity: function(message) {
+    addInvalidity: function (message) {
       this.invalidities.push(message);
     },
 
     // Получаем общий текст сообщений об ошибках
-    getInvalidities: function() {
+    getInvalidities: function () {
       return this.invalidities.join('. \n');
     },
 
     // Сбросим общий текст сообщений об ошибках
-    resetInvalidity: function() {
-      return this.invalidities.length = 0;
+    resetInvalidity: function () {
+      this.invalidities.length = 0;
+      return this.invalidities.length;
     }
   };
 
   // Добавляем обработчик клика на кнопку отправки формы
 
-  submitBtn.addEventListener('click', function() {
+  submitBtn.addEventListener('click', function () {
     // Пройдёмся по всем полям
     for (var i = 0; i < inputs.length; i++) {
-
       var input = inputs[i];
-
       // Проверим валидность поля, используя встроенную в JavaScript функцию checkValidity()
-      if (input.checkValidity() == false) {
-
+      if (input.checkValidity() === false) {
         var inputCustomValidation = new CustomValidation(); // Создадим объект CustomValidation
         inputCustomValidation.checkValidity(input); // Выявим ошибки
         var customValidityMessage = inputCustomValidation.getInvalidities(); // Получим все сообщения об ошибках
@@ -217,8 +173,8 @@
   var openDeliveryCourier = function () {
     deliverCourier.classList.remove('visually-hidden');
     deliverStore.classList.add('visually-hidden');
-    setDisabledAttribute(deliverStore);
-    removeDisabledAttribute(deliverCourier);
+    window.setDisabledAttribute(deliverStore);
+    window.removeDisabledAttribute(deliverCourier);
     deliverCourier.querySelector('.deliver__textarea').removeAttribute('disabled', 'disabled');
   };
 
@@ -227,18 +183,18 @@
   var openDeliveryStore = function () {
     deliverStore.classList.remove('visually-hidden');
     deliverCourier.classList.add('visually-hidden');
-    setDisabledAttribute(deliverCourier);
+    window.setDisabledAttribute(deliverCourier);
     deliverCourier.querySelector('.deliver__textarea').setAttribute('disabled', 'disabled');
-    removeDisabledAttribute(deliverStore);
+    window.removeDisabledAttribute(deliverStore);
   };
 
   // Блокируем поля для курьерской доставки при загрузке формы (так как Клавиша Заеду выбрана по умолчанию)
 
-  var deliverStoreInput = form.querySelector('input[id=deliver__store]');
+  var deliverStoreInput = formOrder.querySelector('input[id=deliver__store]');
 
   // Обработчик с делегированием
 
-  form.addEventListener('click', function (evt) {
+  formOrder.addEventListener('click', function (evt) {
     var target = evt.target;
     if (target.id === 'deliver__courier') {
       openDeliveryCourier();

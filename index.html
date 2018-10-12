@@ -29,7 +29,7 @@
           <ul class="catalog__filter">
             <li class="input-btn">
               <input class="input-btn__input visually-hidden input-btn__input--checkbox" name="food-type" value="icecream" type="checkbox" id="filter-icecream" >
-              <label class="input-btn__label input-btn__label--checkbox" for="filter-icecream">Мороженное</label>
+              <label class="input-btn__label input-btn__label--checkbox" for="filter-icecream">Мороженое</label>
               <span class="input-btn__item-count">(7)</span>
             </li>
 
@@ -87,8 +87,8 @@
               <button class="range__btn range__btn--right" type="button">правый ползунок</button>
             </div>
             <div class="range__prices">
-              <span class="range__price range__price--min">60</span>
-              <span class="range__price range__price--max">230</span>
+              <span class="range__price range__price--min">15</span>
+              <span class="range__price range__price--max">85</span>
             </div>
           </section>
 
@@ -179,12 +179,12 @@
 
               <ul class="contact-data__inputs">
                 <li class="text-input contact-data__input-wrap">
-                  <input type="text" class="text-input__input" name="name" id="contact-data__name" placeholder="Имя" required>
+                  <input type="text" class="text-input__input" name="name" id="contact-data__name" placeholder="Имя" minlength="2" maxlength="40" required>
                   <label for="contact-data__name" class="text-input__label">Имя</label>
                 </li>
 
                 <li class="text-input contact-data__input-wrap">
-                  <input type="tel" class="text-input__input" name="tel" id="contact-data__tel" placeholder="Телефон" required>
+                  <input type="tel" class="text-input__input" name="tel" id="contact-data__tel" placeholder="Телефон" minlength="12" required>
                   <label for="contact-data__tel" class="text-input__label">Телефон</label>
                 </li>
 
@@ -229,7 +229,7 @@
                     </p>
 
                     <p class="text-input text-input--light payment__input-wrap payment__input-wrap--cvc">
-                      <input type="text" class="text-input__input" name="card-cvc" id="payment__card-cvc" placeholder="CVC" pattern="[0-9]{3}" minlength="3" maxlength="3" required>
+                      <input type="text" class="text-input__input" name="card-cvc" id="payment__card-cvc" placeholder="CVC" pattern="[1-9][0-9][0-9]" minlength="3" maxlength="3" required>
                       <label class="text-input__label text-input__label--lock" for="payment__card-cvc">CVC</label>
                     </p>
 
@@ -405,7 +405,7 @@
     </div>
   </footer>
 
-  <section class="modal modal--hidden">
+  <section class="modal modal--hidden modal--error">
     <div class="modal__inner">
       <button class="modal__close" type="button">Закрыть окно</button>
       <h3 class="modal__title">Произошла ошибка!</h3>
@@ -414,7 +414,7 @@
     </div>
   </section>
 
-  <section class="modal modal--hidden">
+  <section class="modal modal--hidden modal--success">
     <div class="modal__inner">
       <button class="modal__close" type="button">Закрыть окно</button>
       <h3 class="modal__title">Данные успешно отправлены!</h3>
@@ -483,10 +483,13 @@
   <template id="empty-filters">
     <div class="catalog__empty-filter">
       <p><b>Хм... Что-то ты перемудрил с фильтрами.</b></p>
-      <p>Попробуй ещё раз, нажав <span class="catalog__show-all">«Показать всё»</span> или посмотри что мы предлагаем тебе попробовать.</p>
+      <p>Попробуй ещё раз, нажав <span class="catalog__show-all" tabindex ="0">«Показать всё»</span> или посмотри что мы предлагаем тебе попробовать.</p>
     </div>
   </template>
-  <script src="js/data.js"></script>
+  <script src="js/disable.js"></script>
+  <script src="js/close.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/backend.js"></script>
   <script src="js/catalog.js"></script>
   <script src="js/order.js"></script>
   <script src="js/filter.js"></script>
