@@ -111,7 +111,6 @@
     function onMouseUp(evt) {
 
       var dropX = evt.clientX + shiftX - rangeFilter.getBoundingClientRect().left;
-      //var dropX = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
       if (dropX < rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left) {
         dropX = rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left;
       }

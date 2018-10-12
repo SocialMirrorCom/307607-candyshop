@@ -152,23 +152,6 @@
         console.log(cardNumderInput.value);
         this.addInvalidity('Введите правильный номер');
       }
-
-      /*if (!floorNumber.value.match(/^[ 0-9]+$/g)) {
-      this.addInvalidity('Введите этаж цифрой');
-      }
-
-      if (!cvcNumber.value.match(/[0-9]{3}/g)) {
-      this.addInvalidity('Введите 3 цифры, указанные на обороте вашей карты');
-      }
-
-      if (!cardDate.value.match(/[0-9]{2}\.[0-9]{2}/g)) {
-      this.addInvalidity('Введите дату по образцу');
-      }
-
-      if (!emailValue.value.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/g)) {
-      this.addInvalidity('Введите адрес электронной почты по образцу: someone@gmail.ru');
-      }*/
-
     },
 
     // Добавляем сообщение об ошибке в массив ошибок

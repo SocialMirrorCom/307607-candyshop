@@ -67,12 +67,6 @@
     emptyCart.classList.add('visually-hidden');
   };
 
-  /*var addCartMessage = function () {
-    emptyCart.classList.toggle('visually-hidden');
-    cart.classList.toggle('goods__cards--empty');
-
-  };*/
-
   // Получаем сумму количества заказанных товаров.
 
   var getSumOfAmount = function (arrey) {
@@ -275,10 +269,7 @@
     price: [],
     favorites: [],
     available: [],
-    popular: [],
-    expensiveFirst: [],
-    cheapFirst: [],
-    foodRating: []
+    sort: []
   };
 
   // Функция проверки по свойствам: без сахара, без глютена, вегетарианское
@@ -438,43 +429,13 @@
       var isEmptyAvailable = activeFilters.available.length === 0;
       var isExistAvailable = !isEmptyAvailable && current.amount > 0;
 
-      var isEmptyPopular = activeFilters.popular.length === 0;
-      var isExistPopular = !isEmptyPopular;
-
-      var isEmptyExpensiveFirst = activeFilters.expensiveFirst.length === 0;
-      var isExistExpensiveFirst = !isEmptyExpensiveFirst;
-
-      var isEmptyCheapFirst = activeFilters.cheapFirst.length === 0;
-      var isExistCheapFirst = !isEmptyCheapFirst;
-
-      var isEmptyFoodRating = activeFilters.foodRating.length === 0;
-      var isExistFoodRating = !isEmptyFoodRating;
-
-      // Если есть какие-то изменения то добавляем в массив
-
       if ((isEmptyKind || isExistInKind) && (isEmptyFoodProperty || isExistFoodProperty) && (isEmptyPrice || isExistPrice) &&
         (isEmptyFavorite || isExistFavorite) && (isEmptyAvailable || isExistAvailable)) {
         filteredList.push(current);
       }
-
-      // Ломает весь фильтр
-
-      /*if (isEmptyPopular || isExistPopular) {
-        filteredList = items;
-      }*/
-
-      if (isEmptyExpensiveFirst || isExistExpensiveFirst) {
-        filteredList = getHigherPriceFirst(filteredList);
-      }
-      if (isEmptyCheapFirst || isExistCheapFirst) {
-        filteredList = getLowerPriceFirst(filteredList);
-      }
-
-      if (isEmptyFoodRating || isExistFoodRating) {
-        filteredList = getHigherRatingFirst(filteredList);
-      }
-
     });
+
+    filteredList = getSortedList(filteredList);
 
     renderCards(filteredList);
 
@@ -608,9 +569,10 @@
     if (activeFilters.available.length > 0) {
       activeFilters.available = [];
     }
-    if (activeFilters.expensiveFirst.length > 0) {
-      activeFilters.expensiveFirst = [];
+    if (activeFilters.sort.length > 0) {
+      activeFilters.sort = [];
     }
+
     removeItems();
     applyFilters(items, target);
   });
@@ -642,171 +604,105 @@
     if (activeFilters.favorites.length > 0) {
       activeFilters.favorites = [];
     }
-    if (activeFilters.expensiveFirst.length > 0) {
-      activeFilters.expensiveFirst = [];
+    if (activeFilters.sort.length > 0) {
+      activeFilters.sort = [];
     }
 
     removeItems();
     applyFilters(items, target);
   });
 
-  // Вспомогательная функция для сортировки цены по убыванию
 
-  var getLowerPriceFirst = function (arrey) {
-    var arreyCopy = arrey.slice();
-    arreyCopy.sort(function (first, second) {
-      if(first.price > second.price) {
-        return 1;
-      } else if (first.price < second.price) {
-        return -1;
-      } else {
-        return 0;
-      }
-    });
-      return arreyCopy;
-    };
-
-
-  // Вспомогательная функция для сортировки цены по возрастанию
-
-  var getHigherPriceFirst = function (arrey) {
-    var arreyCopy = arrey.slice();
-    arreyCopy.sort(function (first, second) {
-      if(first.price < second.price) {
-        return 1;
-      } else if (first.price > second.price) {
-        return -1;
-      } else {
-        return 0;
-      }
-    });
-      return arreyCopy;
-  };
 
   // Вспомогательная функция для сортировки по рейтингу по убыванию
 
   var getHigherRatingFirst = function (arrey) {
     var arreyCopy = arrey.slice();
-    var rating5 = arreyCopy.filter(function(it) {
-      return it.rating.value === 5;
-    });
-    rating5 = getHigherRatingNumberFirst(rating5);
-
-    var rating4 = arreyCopy.filter(function(it) {
-      return it.rating.value === 4;
-    });
-    rating4 = getHigherRatingNumberFirst(rating4);
-
-    var rating3 = arreyCopy.filter(function(it) {
-      return it.rating.value === 3;
-    });
-    rating3 = getHigherRatingNumberFirst(rating3);
-
-    var rating2 = arreyCopy.filter(function(it) {
-      return it.rating.value === 2;
-    });
-    rating2 = getHigherRatingNumberFirst(rating2);
-
-    var rating1 = arreyCopy.filter(function(it) {
-      return it.rating.value === 1;
-    });
-    rating1 = getHigherRatingNumberFirst(rating1);
-
-    arreyCopy = rating5.concat(rating4).concat(rating3).concat(rating2).concat(rating1);
-
-    return arreyCopy;
+    var newArrey = [];
+    for (var i = 5; i > 0; i--) {
+      var filteredArrey = arreyCopy.filter(function(it) {
+        return it.rating.value === i;
+      });
+      newArrey = newArrey.concat(getHigherRatingNumberFirst(filteredArrey));
+      console.log(newArrey);
+    }
+    return newArrey;
     };
 
     var getHigherRatingNumberFirst = function (arrey) {
-    var arreyCopy = arrey.slice();
-    arreyCopy.sort(function (first, second) {
-      if(first.rating.number < second.rating.number) {
-        return 1;
-      } else if (first.rating.number > second.rating.number) {
-        return -1;
-      } else {
-        return 0;
-      }
-    });
+      var arreyCopy = arrey.slice();
+      arreyCopy.sort(function (first, second) {
+        if(first.rating.number < second.rating.number) {
+          return 1;
+        } else if (first.rating.number > second.rating.number) {
+          return -1;
+        } else {
+          return 0;
+        }
+      });
       return arreyCopy;
     };
 
-  // Сортировка по цене по убыванию
 
-  var filterByExpensivePriceFirst = window.utils.debounce(function (evt, items) {
+  // Функция по определению свойства массива sort
+
+  var filterBySort = window.utils.debounce(function (evt, items) {
     var target = evt.target.innerText;
     console.log('items', target);
     setCheckedOnFilter(evt.target);
-      // если в фильтрах по типу нет ни одного фильтра, добавляем текущий таргет
-    if (activeFilters.expensiveFirst.length === 0) {
-      activeFilters.expensiveFirst.push(target);
-    } else if (activeFilters.expensiveFirst.indexOf(target) !== -1 && activeFilters.expensiveFirst.length === 1) {
-      // если в фильтрах по типу есть таргет и он единственный в массиве, очищаем массив
-      activeFilters.expensiveFirst = [];
-    }
+
+    activeFilters.sort = target;
 
     removeItems();
     applyFilters(items, target);
   });
 
-  // Сортировка по цене по возрастанию
+  // Функция по сортировке
 
-  var filterByCheapPriceFirst = window.utils.debounce(function (evt, items) {
-    var target = evt.target.innerText;
-    console.log('items', target);
-    setCheckedOnFilter(evt.target);
-      // если в фильтрах по типу нет ни одного фильтра, добавляем текущий таргет
-    if (activeFilters.cheapFirst.length === 0) {
-      activeFilters.cheapFirst.push(target);
-    } else if (activeFilters.cheapFirst.indexOf(target) !== -1 && activeFilters.cheapFirst.length === 1) {
-      // если в фильтрах по типу есть таргет и он единственный в массиве, очищаем массив
-      activeFilters.cheapFirst = [];
+  var getSortedList = function (arrey) {
+    console.log('getSortList', activeFilters.sort);
+    var arreyCopy = arrey.slice();
+
+    switch (activeFilters.sort) {
+      case 'Сначала популярные': {
+        arreyCopy = goods;
+        break;
+      }
+
+      case 'Сначала дорогие': {
+        arreyCopy.sort(function (first, second) {
+          if(first.price < second.price) {
+            return 1;
+          } else if (first.price > second.price) {
+            return -1;
+          } else {
+            return 0;
+          }
+        });
+        break;
+      }
+
+      case 'Сначала дешёвые': {
+        arreyCopy.sort(function (first, second) {
+          if(first.price > second.price) {
+            return 1;
+          } else if (first.price < second.price) {
+            return -1;
+          } else {
+            return 0;
+          }
+        });
+        break;
+      }
+
+      case 'По рейтингу': {
+        arreyCopy = getHigherRatingFirst(arreyCopy);
+        break;
+      }
     }
 
-    removeItems();
-    applyFilters(items, target);
-  });
-
-  // Сортировка по рейтингу по убыванию
-
-  var filterByRating = window.utils.debounce(function (evt, items) {
-    var target = evt.target.innerText;
-    console.log('items', target);
-    setCheckedOnFilter(evt.target);
-      // если в фильтрах по типу нет ни одного фильтра, добавляем текущий таргет
-    if (activeFilters.foodRating.length === 0) {
-      activeFilters.foodRating.push(target);
-    } else if (activeFilters.foodRating.indexOf(target) !== -1 && activeFilters.foodRating.length === 1) {
-      // если в фильтрах по типу есть таргет и он единственный в массиве, очищаем массив
-      activeFilters.foodRating = [];
-    }
-
-    removeItems();
-    applyFilters(items, target);
-  });
-
-  /*var filterByPopular = window.utils.debounce(function (evt, items) {
-    var target = evt.target.innerText;
-    console.log('items', target);
-    setCheckedOnFilter(evt.target);
-      // если в фильтрах по типу нет ни одного фильтра, добавляем текущий таргет
-    if (activeFilters.popular.length === 0) {
-      activeFilters.popular.push(target);
-    } else if (activeFilters.popular.indexOf(target) !== -1 && activeFilters.popular.length === 1) {
-      // если в фильтрах по типу есть таргет и он единственный в массиве, очищаем массив
-      activeFilters.popular = [];
-    } else if (activeFilters.popular.indexOf(target) !== -1 && activeFilters.popular.length > 1) {
-      // если в фильтрах есть таргет и длина массива больше 1, удаляем таргет из фильтров
-      activeFilters.popular = activeFilters.popular.filter(function (item) {
-        return item !== target;
-      });
-    } else if (activeFilters.popular.indexOf(target) === -1 && activeFilters.popular.length > 0) {
-      // если в фильтрах нет таргета, и длина массива с фильтрами больше 0, добавляем таргет в фильтры
-      activeFilters.popular.push(target);
-    }
-    removeItems();
-    applyFilters(items, target);
-  });*/
+    return arreyCopy;
+  };
 
   // Oбработчик на клик по фильтрам
   var onFiltersClick = function (evt) {
@@ -824,14 +720,14 @@
       filterByFavorite(evt, goods);
     } else if (target === 'В наличии') {
       filterByAvailable(evt, goods);
-    //} else if (target === 'Сначала популярные') {
-      //filterByPopular(evt, goods);
+    } else if (target === 'Сначала популярные') {
+      filterBySort(evt, goods);
     } else if (target === 'Сначала дорогие') {
-      filterByExpensivePriceFirst(evt, goods);
+      filterBySort(evt, goods);
     } else if (target === 'Сначала дешёвые') {
-      filterByCheapPriceFirst(evt, goods);
+      filterBySort(evt, goods);
     } else if (target === 'По рейтингу') {
-      filterByRating(evt, goods);
+      filterBySort(evt, goods);
     }
 
     putNumberOfGoodsInSpan(target);
@@ -848,7 +744,6 @@
       var target = parseInt(rangePriceMax.textContent, 10);
     }
     filterByPrice(evt, goods);
-    //putEmptyFilterMessage();
   };
 
   var submitButton = filterSidebar.querySelector('.catalog__submit');
@@ -877,21 +772,7 @@
 
   rangeButtonLeft.addEventListener('mousemove', onPriceFilterMousemove);
 
-
-
-
-  /////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
+  // Отрисовываем карточки
 
   var renderCards = function (data) {
 
@@ -902,8 +783,6 @@
   // Вставляем во фрагмент элементы
 
   for (var i = 0; i < data.length; i++) {
-    //data[i].orderedAmount = 0;
-    //data[i].favorite = false;
 
     fragment.appendChild(renderCard(similarCardTemplate, data[i]));
 
@@ -944,7 +823,6 @@
 
     cardElement.querySelector('.card-order__img').setAttribute('src', 'img/cards/' + good.picture);
     cardElement.querySelector('.card-order__img').setAttribute('alt', good.name);
-    //cardElement.querySelector('.card-order__img').innerHTML = '<img src="img/cards/' + good.picture + '" alt="' + good.name + '" class="card-order__img" width="265" height="264">';
 
     cardElement.querySelector('.card-order__price').textContent = good.price + ' ₽';
     cardElement.querySelector('.card-order__count').value = good.orderedAmount;
