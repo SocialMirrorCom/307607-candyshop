@@ -3,17 +3,15 @@
 
   // Выбор формы оплаты заказа
   // Переменные
-  var form = document.querySelector('.form-order');
-  var submitBtn = form.querySelector('.buy__submit-btn');
-  var inputCard = form.querySelector('input[value=card]');
-  var inputCash = form.querySelector('input[value=cash]');
-  var paymentCardForm = form.querySelector('.payment__card-wrap');
-  var paymentCashAlarm = form.querySelector('.payment__cash-wrap');
-  var inputs = form.querySelectorAll('input');
-  var floorNumber = form.querySelector('input[name=deliver-floor]');
+  var formOrder = document.querySelector('.form-order');
+  var submitBtn = formOrder.querySelector('.buy__submit-btn');
+  var inputCard = formOrder.querySelector('input[value=card]');
+  var inputCash = formOrder.querySelector('input[value=cash]');
+  var paymentCardForm = formOrder.querySelector('.payment__card-wrap');
+  var paymentCashAlarm = formOrder.querySelector('.payment__cash-wrap');
+  var inputs = formOrder.querySelectorAll('input');
   var cvcNumber = paymentCardForm.querySelector('input[name=card-cvc]');
   var cardDate = paymentCardForm.querySelector('input[name=card-date]');
-  var emailValue = form.querySelector('input[name=email]');
   var cardNumderInput = paymentCardForm.querySelector('input[name=card-number]');
   var cardName = paymentCardForm.querySelector('input[name=cardholder]');
   var cardStatus = paymentCardForm.querySelector('.payment__card-status');
@@ -24,15 +22,6 @@
     var inputsArrey = form.querySelectorAll('input');
     for (var i = 0; i < inputsArrey.length; i++) {
       inputsArrey[i].setAttribute('disabled', 'disabled');
-    }
-  };
-
-  // Функция, которая создает массив инпутов в форме и удаляет им атрибуты disabled
-
-  window.removeDisabledAttribute = function (form) {
-    var inputsArrey = form.querySelectorAll('input');
-    for (var i = 0; i < inputsArrey.length; i++) {
-      inputsArrey[i].removeAttribute('disabled', 'disabled');
     }
   };
 
@@ -50,7 +39,7 @@
   inputCard.addEventListener('click', function () {
     paymentCashAlarm.classList.add('visually-hidden');
     paymentCardForm.classList.remove('visually-hidden');
-    removeDisabledAttribute(paymentCardForm);
+    window.removeDisabledAttribute(paymentCardForm);
   });
 
   // Валидация формы оформления заказа
@@ -60,10 +49,10 @@
     var cart = document.querySelector('.goods__cards');
     var currentCartArrey = cart.querySelectorAll('.goods_card');
     if (currentCartArrey.length === 0) {
-      setDisabledAttribute(form);
+      setDisabledAttribute(formOrder);
       submitBtn.setAttribute('disabled', 'disabled');
-      }
-    };
+    }
+  };
   getFormBlocked();
 
   // Алгоритм Луна
@@ -76,12 +65,12 @@
       if (i % 2 === 0) {
         arr[i] *= 2;
       } else {
-        arr[i];
+        arr[i] = arr[i];
       }
       if (arr[i] >= 10) {
         arr[i] -= 9;
       } else {
-        arr[i];
+        arr[i] = arr[i];
       }
       sum += arr[i];
     }
@@ -97,22 +86,18 @@
 
   // Определяем статус кредитной карты Одобрен/Не одобрен
 
-  paymentCardForm.addEventListener('input', function(evt) {
+  paymentCardForm.addEventListener('input', function (evt) {
     if (evt.target === cardNumderInput) {
       valid.cardNumderInput = moonAlgorythm(evt.target.value);
-      console.log(valid.cardNumderInput);
     }
     if (evt.target === cardDate) {
       valid.cardDate = evt.target.checkValidity();
-      console.log(valid.cardDate);
     }
     if (evt.target === cvcNumber) {
       valid.cvcNumber = evt.target.checkValidity();
-      console.log(valid.cvcNumber);
     }
     if (evt.target === cardName) {
       valid.cardName = evt.target.checkValidity();
-      console.log(valid.cardName);
     }
     cardStatus.textContent = (valid.cardNumderInput && valid.cardDate && valid.cvcNumber && valid.cardName) ? 'одобрен' : 'не одобрен';
   });
@@ -126,7 +111,7 @@
     invalidities: [],
 
     // Метод, проверяющий валидность
-    checkValidity: function(input) {
+    checkValidity: function (input) {
 
       var validity = input.validity;
 
@@ -149,38 +134,34 @@
       }
 
       if (!moonAlgorythm(cardNumderInput.value)) {
-        console.log(cardNumderInput.value);
         this.addInvalidity('Введите правильный номер');
       }
     },
 
     // Добавляем сообщение об ошибке в массив ошибок
-    addInvalidity: function(message) {
+    addInvalidity: function (message) {
       this.invalidities.push(message);
     },
 
     // Получаем общий текст сообщений об ошибках
-    getInvalidities: function() {
+    getInvalidities: function () {
       return this.invalidities.join('. \n');
     },
 
     // Сбросим общий текст сообщений об ошибках
-    resetInvalidity: function() {
+    resetInvalidity: function () {
       return this.invalidities.length = 0;
     }
   };
 
   // Добавляем обработчик клика на кнопку отправки формы
 
-  submitBtn.addEventListener('click', function() {
+  submitBtn.addEventListener('click', function () {
     // Пройдёмся по всем полям
     for (var i = 0; i < inputs.length; i++) {
-
       var input = inputs[i];
-
       // Проверим валидность поля, используя встроенную в JavaScript функцию checkValidity()
-      if (input.checkValidity() == false) {
-
+      if (input.checkValidity() === false) {
         var inputCustomValidation = new CustomValidation(); // Создадим объект CustomValidation
         inputCustomValidation.checkValidity(input); // Выявим ошибки
         var customValidityMessage = inputCustomValidation.getInvalidities(); // Получим все сообщения об ошибках
@@ -201,7 +182,7 @@
     deliverCourier.classList.remove('visually-hidden');
     deliverStore.classList.add('visually-hidden');
     setDisabledAttribute(deliverStore);
-    removeDisabledAttribute(deliverCourier);
+    window.removeDisabledAttribute(deliverCourier);
     deliverCourier.querySelector('.deliver__textarea').removeAttribute('disabled', 'disabled');
   };
 
@@ -212,16 +193,16 @@
     deliverCourier.classList.add('visually-hidden');
     setDisabledAttribute(deliverCourier);
     deliverCourier.querySelector('.deliver__textarea').setAttribute('disabled', 'disabled');
-    removeDisabledAttribute(deliverStore);
+    window.removeDisabledAttribute(deliverStore);
   };
 
   // Блокируем поля для курьерской доставки при загрузке формы (так как Клавиша Заеду выбрана по умолчанию)
 
-  var deliverStoreInput = form.querySelector('input[id=deliver__store]');
+  var deliverStoreInput = formOrder.querySelector('input[id=deliver__store]');
 
   // Обработчик с делегированием
 
-  form.addEventListener('click', function (evt) {
+  formOrder.addEventListener('click', function (evt) {
     var target = evt.target;
     if (target.id === 'deliver__courier') {
       openDeliveryCourier();
@@ -295,5 +276,4 @@
     mapImg.setAttribute('alt', 'Технологический институт');
     mapAddress.textContent = 'нет точного адреса';
   });
-
 })();

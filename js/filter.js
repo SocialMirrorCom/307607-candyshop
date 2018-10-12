@@ -10,17 +10,13 @@
   var rangePriceMax = range.querySelector('.range__price--max');
   var rangeFillLine = range.querySelector('.range__fill-line');
 
-  rangeButtonLeft.addEventListener('mousedown', function(evt) {
-
+  rangeButtonLeft.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
-
     var shiftX = evt.clientX - rangeButtonLeft.getBoundingClientRect().left;
-
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
-
-    function onMouseMove(evt) {
-      var newLeft = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+    function onMouseMove(evtMove) {
+      var newLeft = evtMove.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
 
       if (newLeft < 0) {
         newLeft = 0;
@@ -44,9 +40,9 @@
 
     }
 
-    function onMouseUp(evt) {
+    function onMouseUp(evtUp) {
 
-      var dropX = evt.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
+      var dropX = evtUp.clientX - shiftX - rangeFilter.getBoundingClientRect().left;
       if (dropX < 0) {
         dropX = 0;
       }
@@ -69,11 +65,11 @@
     }
   });
 
-  rangeButtonLeft.ondragstart = function() {
+  rangeButtonLeft.ondragstart = function () {
     return false;
   };
 
- rangeButtonRight.addEventListener('mousedown', function(evt) {
+  rangeButtonRight.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
     var shiftX = rangeButtonRight.getBoundingClientRect().right - evt.clientX;
@@ -81,9 +77,9 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
 
-    function onMouseMove(evt) {
+    function onMouseMove(evtMove) {
 
-      var newRight = evt.clientX + shiftX - rangeFilter.getBoundingClientRect().left;
+      var newRight = evtMove.clientX + shiftX - rangeFilter.getBoundingClientRect().left;
 
       if (newRight < rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left) {
         newRight = rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left;
@@ -108,9 +104,9 @@
 
     }
 
-    function onMouseUp(evt) {
+    function onMouseUp(evtUp) {
 
-      var dropX = evt.clientX + shiftX - rangeFilter.getBoundingClientRect().left;
+      var dropX = evtUp.clientX + shiftX - rangeFilter.getBoundingClientRect().left;
       if (dropX < rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left) {
         dropX = rangeButtonLeft.getBoundingClientRect().right - rangeFilter.getBoundingClientRect().left;
       }
@@ -134,7 +130,7 @@
 
   });
 
-  rangeButtonRight.ondragstart = function() {
+  rangeButtonRight.ondragstart = function () {
     return false;
   };
 })();
