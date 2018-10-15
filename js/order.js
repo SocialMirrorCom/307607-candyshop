@@ -36,7 +36,7 @@
   // Валидация формы оформления заказа
   // Если в корзине нет ни одного товара, форма оформления заказа блокируется
 
-  var getFormBlocked = function () {
+  window.getFormBlocked = function () {
     var cart = document.querySelector('.goods__cards');
     var currentCartArrey = cart.querySelectorAll('.goods_card');
     if (currentCartArrey.length === 0) {
@@ -44,7 +44,9 @@
       submitBtn.setAttribute('disabled', 'disabled');
     }
   };
-  getFormBlocked();
+
+
+  window.getFormBlocked();
 
   // Алгоритм Луна
 
@@ -208,64 +210,76 @@
 
   var mapImg = document.querySelector('.deliver__store-map-img');
   var mapAddress = document.querySelector('.deliver__store-describe');
+  var deliverStoreList = document.querySelector('.deliver__store-list');
+  var activeStoreInput;
 
-  document.querySelector('input[value=academicheskaya]').addEventListener('click', function () {
-    mapImg.setAttribute('src', 'img/map/academicheskaya.jpg');
-    mapImg.setAttribute('alt', 'Академическая');
-    mapAddress.textContent = 'проспект Науки, д. 19, корп. 3, литер А, ТК «Платформа», 3-й этаж, секция 310';
-  });
+  var getCorrectMapAndAddress = function (evt) {
+    switch (activeStoreInput) {
+      case 'academicheskaya': {
+        mapImg.setAttribute('src', 'img/map/academicheskaya.jpg');
+        mapImg.setAttribute('alt', 'Академическая');
+        mapAddress.textContent = 'проспект Науки, д. 19, корп. 3, литер А, ТК «Платформа», 3-й этаж, секция 310';
+        break;
+      }
+      case 'vasileostrovskaya': {
+        mapImg.setAttribute('src', 'img/map/vasileostrovskaya.jpg');
+        mapImg.setAttribute('alt', 'Василеостровская');
+        mapAddress.textContent = 'нет точного адреса';
+        break;
+      }
+      case 'rechka': {
+        mapImg.setAttribute('src', 'img/map/rechka.jpg');
+        mapImg.setAttribute('alt', 'Черная речка');
+        mapAddress.textContent = 'нет точного адреса';
+        break;
+      }
+      case 'petrogradskaya': {
+        mapImg.setAttribute('src', 'img/map/petrogradskaya.jpg');
+        mapImg.setAttribute('alt', 'Петроградская');
+        mapAddress.textContent = 'нет точного адреса';
+        break;
+      }
+      case 'proletarskaya': {
+        mapImg.setAttribute('src', 'img/map/proletarskaya.jpg');
+        mapImg.setAttribute('alt', 'Пролетарская');
+        mapAddress.textContent = 'нет точного адреса';
+        break;
+      }
+      case 'vostaniya': {
+        mapImg.setAttribute('src', 'img/map/vostaniya.jpg');
+        mapImg.setAttribute('alt', 'Площадь Восстания');
+        mapAddress.textContent = 'нет точного адреса';
+        break;
+      }
+      case 'prosvesheniya': {
+        mapImg.setAttribute('src', 'img/map/prosvesheniya.jpg');
+        mapImg.setAttribute('alt', 'Проспект Просвещения');
+        mapAddress.textContent = 'нет точного адреса';
+        break;
+      }
+      case 'frunzenskaya': {
+        mapImg.setAttribute('src', 'img/map/frunzenskaya.jpg');
+        mapImg.setAttribute('alt', 'Фрунзенская');
+        mapAddress.textContent = 'нет точного адреса';
+        break;
+      }
+      case 'chernishevskaya': {
+        mapImg.setAttribute('src', 'img/map/chernishevskaya.jpg');
+        mapImg.setAttribute('alt', 'Чернышевская');
+        mapAddress.textContent = 'нет точного адреса';
+        break;
+      }
+      case 'tehinstitute': {
+        mapImg.setAttribute('src', 'img/map/tehinstitute.jpg');
+        mapImg.setAttribute('alt', 'Технологический институт');
+        mapAddress.textContent = 'нет точного адреса';
+        break;
+      }
+    }
+  };
 
-  document.querySelector('input[value=vasileostrovskaya]').addEventListener('click', function () {
-    mapImg.setAttribute('src', 'img/map/vasileostrovskaya.jpg');
-    mapImg.setAttribute('alt', 'Василеостровская');
-    mapAddress.textContent = 'нет точного адреса';
-  });
-
-  document.querySelector('input[value=rechka]').addEventListener('click', function () {
-    mapImg.setAttribute('src', 'img/map/rechka.jpg');
-    mapImg.setAttribute('alt', 'Черная речка');
-    mapAddress.textContent = 'нет точного адреса';
-  });
-
-  document.querySelector('input[value=petrogradskaya]').addEventListener('click', function () {
-    mapImg.setAttribute('src', 'img/map/petrogradskaya.jpg');
-    mapImg.setAttribute('alt', 'Петроградская');
-    mapAddress.textContent = 'нет точного адреса';
-  });
-
-  document.querySelector('input[value=proletarskaya]').addEventListener('click', function () {
-    mapImg.setAttribute('src', 'img/map/proletarskaya.jpg');
-    mapImg.setAttribute('alt', 'Пролетарская');
-    mapAddress.textContent = 'нет точного адреса';
-  });
-
-  document.querySelector('input[value=vostaniya]').addEventListener('click', function () {
-    mapImg.setAttribute('src', 'img/map/vostaniya.jpg');
-    mapImg.setAttribute('alt', 'Площадь Восстания');
-    mapAddress.textContent = 'нет точного адреса';
-  });
-
-  document.querySelector('input[value=prosvesheniya]').addEventListener('click', function () {
-    mapImg.setAttribute('src', 'img/map/prosvesheniya.jpg');
-    mapImg.setAttribute('alt', 'Проспект Просвещения');
-    mapAddress.textContent = 'нет точного адреса';
-  });
-
-  document.querySelector('input[value=frunzenskaya]').addEventListener('click', function () {
-    mapImg.setAttribute('src', 'img/map/frunzenskaya.jpg');
-    mapImg.setAttribute('alt', 'Фрунзенская');
-    mapAddress.textContent = 'нет точного адреса';
-  });
-
-  document.querySelector('input[value=chernishevskaya]').addEventListener('click', function () {
-    mapImg.setAttribute('src', 'img/map/chernishevskaya.jpg');
-    mapImg.setAttribute('alt', 'Чернышевская');
-    mapAddress.textContent = 'нет точного адреса';
-  });
-
-  document.querySelector('input[value=tehinstitute]').addEventListener('click', function () {
-    mapImg.setAttribute('src', 'img/map/tehinstitute.jpg');
-    mapImg.setAttribute('alt', 'Технологический институт');
-    mapAddress.textContent = 'нет точного адреса';
+  deliverStoreList.addEventListener('click', function (evt) {
+    activeStoreInput = evt.target.value;
+    getCorrectMapAndAddress();
   });
 })();

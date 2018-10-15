@@ -1,6 +1,11 @@
 'use strict';
 (function () {
 
+  var FILTER_PRICE_MIN = 15;
+  var FILTER_PRICE_MAX = 85;
+  var LEFT_RANGE_BUTTON_X = 104.75 - 68;
+  var RIGHT_RANGE_BUTTON_X = 266.25 - 68;
+
   // Модальное окно ошибки
 
   var modalError = document.querySelector('.modal--error');
@@ -60,6 +65,8 @@
     .content
     .querySelector('.catalog__card');
 
+  // Удаляем сообщение о пустой корзине
+
   var emptyCart = document.querySelector('.goods__card-empty');
 
   var removeCartMessage = function () {
@@ -67,11 +74,19 @@
     emptyCart.classList.add('visually-hidden');
   };
 
-  // Информируем о пустой корзине
+  // Помещаем/удаляем сообщение в/из пустую корзину с помощью tamplate
+
+  var emptyCartTemplate = document.querySelector('#cards-empty')
+    .content
+    .querySelector('.goods__card-empty');
+  var emptyCartMessage = emptyCartTemplate.cloneNode(true);
 
   var putEmptyCartMessage = function () {
-    cart.classList.add('goods__cards--empty');
-    emptyCart.classList.remove('visually-hidden');
+    cart.appendChild(emptyCartMessage);
+  };
+
+  var removeEmptyCartMessage = function () {
+    cart.removeChild(emptyCartMessage);
   };
 
   // Получаем сумму количества заказанных товаров.
@@ -90,7 +105,6 @@
     var cartMessage = document.querySelector('.main-header__basket');
     if (arrey.length === 0) {
       cartMessage.textContent = 'В корзине ничего нет';
-      putEmptyCartMessage();
     } else {
       cartMessage.textContent = 'В корзине есть товар: ' + getSumOfAmount(arrey);
     }
@@ -178,7 +192,6 @@
       cardCharacteristic.textContent = 'Содержит сахар. ' + good.nutritionFacts.energy + ' ккал';
     }
 
-    // cardElement.querySelector('.card__composition').classList.remove('card__composition--hidden');
     cardElement.querySelector('.card__composition-list').textContent = good.nutritionFacts.contents;
 
     // Вешаем на карточку обработчик клика
@@ -224,17 +237,7 @@
     return cardElement;
   };
 
-  // Находим и записываем в переменные инпуты Бокового Фильтра
-
-  var filterSidebar = document.querySelector('.catalog__sidebar');
-  var range = document.querySelector('.range');
-  var rangeFilter = range.querySelector('.range__filter');
-  var rangeButtonLeft = rangeFilter.querySelector('.range__btn--left');
-  var rangeButtonRight = rangeFilter.querySelector('.range__btn--right');
-  var rangePriceMin = range.querySelector('.range__price--min');
-  var rangePriceMax = range.querySelector('.range__price--max');
-  var goods = [];
-  var filteredList = [];
+  window.goods = [];
 
   var onLoad = function (data) {
     goods = data;
@@ -253,495 +256,10 @@
 
   // Функция для фильтрации по типу товара
 
-  // Объект с массивами активных фильтров
-
-  var activeFilters = {
-    foodKinds: [],
-    foodProperties: [],
-    price: [],
-    favorites: [],
-    available: [],
-    sort: []
-  };
-
-  // Функция проверки по свойствам: без сахара, без глютена, вегетарианское
-
-  var checkFoodProperties = function (foodProperty) {
-    var isGlutenActive = activeFilters.foodProperties.indexOf('gluten') !== -1;
-    var isSugarActive = activeFilters.foodProperties.indexOf('sugar') !== -1;
-    var isVeganActive = activeFilters.foodProperties.indexOf('vegetarian') !== -1;
-    var gluten = isGlutenActive && !foodProperty.gluten;
-    var sugar = isSugarActive && !foodProperty.sugar;
-    var vegan = isVeganActive && foodProperty.vegetarian;
-    return (
-      (!isGlutenActive || gluten) &&
-      (!isSugarActive || sugar) &&
-      (!isVeganActive || vegan)
-    );
-  };
-
-  // Функция - удаление карточек
-
-  var removeItems = function () {
-    while (catalogCards.firstChild) {
-      catalogCards.removeChild(catalogCards.firstChild);
-    }
-  };
-
-  // Функция, которая запускает сообщение, если  по фильтру нет подходящих товаров
-
-  var emptyFilterTemplate = document.querySelector('#empty-filters')
-    .content
-    .querySelector('.catalog__empty-filter');
-  var emptyFilterMessage = emptyFilterTemplate.cloneNode(true);
-
-  var putEmptyFilterMessage = function () {
-    if (filteredList.length === 0) {
-      catalogCards.appendChild(emptyFilterMessage);
-    }
-  };
-
-  // Функция, которая показывает все товары при нажатии на кнопку Показать все
-
-  var showAllButton = emptyFilterMessage.querySelector('.catalog__show-all');
-  var onShowAll = function () {
-    renderCards(goods);
-    catalogCards.removeChild(emptyFilterMessage);
-  };
-
-  showAllButton.addEventListener('click', onShowAll);
-
-  // Функция переключения состояния у инпутов
-
-  var setCheckedOnFilter = function (tag) {
-    var parent = tag.closest('.input-btn');
-    var input = parent.querySelector('.input-btn__input');
-    if (input.checked) {
-      input.checked = false;
-    } else {
-      input.checked = true;
-    }
-  };
-
-  // Находим правильный спан для записи количества продукции
-
-  var putNumberOfGoodsInSpan = function (target) {
-    var span;
-    if (target === 'Мороженое') {
-      var icecreamList = goods.filter(function (it) {
-        return it.kind === 'Мороженое';
-      });
-      span = filterSidebar.querySelector('#filter-icecream ~ span');
-      span.textContent = '(' + icecreamList.length + ')';
-    }
-    if (target === 'Газировка') {
-      var sodaList = goods.filter(function (it) {
-        return it.kind === 'Газировка';
-      });
-      span = filterSidebar.querySelector('#filter-soda ~ span');
-      span.textContent = '(' + sodaList.length + ')';
-    }
-    if (target === 'Жевательная резинка') {
-      var gumList = goods.filter(function (it) {
-        return it.kind === 'Жевательная резинка';
-      });
-      span = filterSidebar.querySelector('#filter-gum ~ span');
-      span.textContent = '(' + gumList.length + ')';
-    }
-    if (target === 'Мармелад') {
-      var marmaladeList = goods.filter(function (it) {
-        return it.kind === 'Мармелад';
-      });
-      span = filterSidebar.querySelector('#filter-marmalade ~ span');
-      span.textContent = '(' + marmaladeList.length + ')';
-    }
-    if (target === 'Зефир') {
-      var marshmallowList = goods.filter(function (it) {
-        return it.kind === 'Зефир';
-      });
-      span = filterSidebar.querySelector('#filter-marshmallows ~ span');
-      span.textContent = '(' + marshmallowList.length + ')';
-    }
-    if (target === 'Без сахара') {
-      var sugarfreeList = goods.filter(function (it) {
-        return it.nutritionFacts.sugar === false;
-      });
-      span = filterSidebar.querySelector('#filter-sugar-free ~ span');
-      span.textContent = '(' + sugarfreeList.length + ')';
-    }
-    if (target === 'Безглютеновое') {
-      var glutenfreeList = goods.filter(function (it) {
-        return it.nutritionFacts.gluten === false;
-      });
-      span = filterSidebar.querySelector('#filter-gluten-free ~ span');
-      span.textContent = '(' + glutenfreeList.length + ')';
-    }
-    if (target === 'Вегетарианское') {
-      var vegetarianList = goods.filter(function (it) {
-        return it.nutritionFacts.vegetarian === true;
-      });
-      span = filterSidebar.querySelector('#filter-vegetarian ~ span');
-      span.textContent = '(' + vegetarianList.length + ')';
-    }
-    if (target === 'Только избранное') {
-      var favoriteList = goods.filter(function (it) {
-        return it.favorite === true;
-      });
-      span = filterSidebar.querySelector('#filter-favorite ~ span');
-      span.textContent = '(' + favoriteList.length + ')';
-    }
-    if (target === 'В наличии') {
-      var availableList = goods.filter(function (it) {
-        return it.amount > 0;
-      });
-      span = filterSidebar.querySelector('#filter-availability ~ span');
-      span.textContent = '(' + availableList.length + ')';
-    }
-  };
-
-  // Применение фильтров
-
-  var applyFilters = function (items) {
-    filteredList = [];
-    items.forEach(function (current) {
-
-      var isEmptyKind = activeFilters.foodKinds.length === 0;
-      var isExistInKind = !isEmptyKind && activeFilters.foodKinds.indexOf(current.kind) !== -1;
-
-      var isEmptyFoodProperty = activeFilters.foodProperties.length === 0;
-      var isExistFoodProperty = !isEmptyFoodProperty && checkFoodProperties(current.nutritionFacts);
-
-      var isEmptyPrice = activeFilters.price.length === 0;
-      var isExistPrice = !isEmptyPrice && checkPrice(current.price);
-
-      var isEmptyFavorite = activeFilters.favorites.length === 0;
-      var isExistFavorite = !isEmptyFavorite && current.favorite === true;
-
-      var isEmptyAvailable = activeFilters.available.length === 0;
-      var isExistAvailable = !isEmptyAvailable && current.amount > 0;
-
-      if ((isEmptyKind || isExistInKind) && (isEmptyFoodProperty || isExistFoodProperty) && (isEmptyPrice || isExistPrice) &&
-        (isEmptyFavorite || isExistFavorite) && (isEmptyAvailable || isExistAvailable)) {
-        filteredList.push(current);
-      }
-    });
-
-    filteredList = getSortedList(filteredList);
-
-    renderCards(filteredList);
-
-    putEmptyFilterMessage();
-  };
-
-  // Фильтр для food-type
-
-  var filterByKind = window.utils.debounce(function (evt, items) {
-    var target = evt.target.innerText;
-    setCheckedOnFilter(evt.target);
-    // если в фильтрах по типу нет ни одного фильтра, добавляем текущий таргет
-    if (activeFilters.foodKinds.length === 0) {
-      activeFilters.foodKinds.push(target);
-    } else if (activeFilters.foodKinds.indexOf(target) !== -1 && activeFilters.foodKinds.length === 1) {
-      // если в фильтрах по типу есть таргет и он единственный в массиве, очищаем массив
-      activeFilters.foodKinds = [];
-    } else if (activeFilters.foodKinds.indexOf(target) !== -1 && activeFilters.foodKinds.length > 1) {
-      // если в фильтрах есть таргет и длина массива больше 1, удаляем таргет из фильтров
-      activeFilters.foodKinds = activeFilters.foodKinds.filter(function (item) {
-        return item !== target;
-      });
-    } else if (activeFilters.foodKinds.indexOf(target) === -1 && activeFilters.foodKinds.length > 0) {
-      // если в фильтрах нет таргета, и длина массива с фильтрами больше 0, добавляем таргет в фильтры
-      activeFilters.foodKinds.push(target);
-    }
-    removeItems();
-    applyFilters(items, target);
-  });
-
-  // Вспомогательная функция для food-property
-
-  var getFoodProperty = function (foodProperty) {
-    if (foodProperty === 'Без сахара') {
-      return 'sugar';
-    } else if (foodProperty === 'Вегетарианское') {
-      return 'vegetarian';
-    } else if (foodProperty === 'Безглютеновое') {
-      return 'gluten';
-    } return '';
-  };
-
-  // Фильтер для food-property
-
-  var filterByFoodProperty = window.utils.debounce(function (evt, items) {
-    var target = getFoodProperty(evt.target.innerText);
-    setCheckedOnFilter(evt.target);
-
-    // если фильтр по фактам пуст добавляем таргет в фильтры
-    if (activeFilters.foodProperties.length === 0) {
-      activeFilters.foodProperties.push(target);
-    } else if (activeFilters.foodProperties.indexOf(target) !== -1 && activeFilters.foodProperties.length === 1) {
-      // если таргет есть в фильтрах и длина массива равна 1, очищаем массив
-      activeFilters.foodProperties = [];
-    } else if (activeFilters.foodProperties.indexOf(target) !== -1 && activeFilters.foodProperties.length > 1) {
-      // если таргет есть в фильтрах и длина массивы больше 1, удаляем таргетный фильтр
-      activeFilters.foodProperties = activeFilters.foodProperties.filter(function (item) {
-        return item !== target;
-      });
-    } else if (activeFilters.foodProperties.indexOf(target) === -1 && activeFilters.foodProperties.length > 0) {
-      // если таргета в фильтрах нет и длина массива больше 0, добавляем таргетный фильтр
-      activeFilters.foodProperties.push(target);
-    }
-    removeItems();
-    applyFilters(items, target);
-  });
-
-  // Вспомогательная функция для цены
-
-  var checkPrice = function (price) {
-    var priceFits = false;
-    if (price > parseInt(rangePriceMin.textContent, 10) && price < parseInt(rangePriceMax.textContent, 10)) {
-      priceFits = true;
-    }
-    return priceFits;
-  };
-
-  // Фильтр по цене
-
-  var filterByPrice = window.utils.debounce(function (evt, items) {
-    if (evt.target === rangeButtonLeft) {
-      var target = parseInt(rangePriceMin.textContent, 10);
-    }
-    if (evt.target === rangeButtonRight) {
-      target = parseInt(rangePriceMax.textContent, 10);
-    }
-    // если фильтр по цене пуст добавляем таргет в фильтры
-    if (activeFilters.price.length === 0) {
-      activeFilters.price.push(target);
-    } else if (activeFilters.price.indexOf(target) !== -1 && activeFilters.price.length === 1) {
-      // если таргет есть в фильтрах и длина массива равна 1, очищаем массив
-      activeFilters.price = [];
-    } else if (activeFilters.price.indexOf(target) !== -1 && activeFilters.price.length > 1) {
-      // если таргет есть в фильтрах и длина массивы больше 1, удаляем таргетный фильтр
-      activeFilters.price = activeFilters.price.filter(function (item) {
-        return item !== target;
-      });
-    } else if (activeFilters.price.indexOf(target) === -1 && activeFilters.price.length > 0) {
-      // если таргета в фильтрах нет и длина массива больше 0, добавляем таргетный фильтр
-      activeFilters.price.push(target);
-    }
-    removeItems();
-    applyFilters(items, target);
-  });
-
-  // Фильтр для избранного
-
-  var filterByFavorite = window.utils.debounce(function (evt, items) {
-    var target = evt.target.innerText;
-    setCheckedOnFilter(evt.target);
-
-    // если фильтр по избранному пуст добавляем таргет в фильтры
-    if (activeFilters.favorites.length === 0) {
-      activeFilters.favorites.push(target);
-    } else if (activeFilters.favorites.indexOf(target) !== -1 && activeFilters.favorites.length === 1) {
-      // если таргет есть в фильтрах и длина массива равна 1, очищаем массив
-      activeFilters.favorites = [];
-    }
-    if (activeFilters.foodKinds.length > 0) {
-      activeFilters.foodKinds = [];
-    }
-    if (activeFilters.foodProperties.length > 0) {
-      activeFilters.foodProperties = [];
-    }
-    if (activeFilters.price.length > 0) {
-      activeFilters.price = [];
-    }
-    if (activeFilters.available.length > 0) {
-      activeFilters.available = [];
-    }
-    if (activeFilters.sort.length > 0) {
-      activeFilters.sort = [];
-    }
-
-    removeItems();
-    applyFilters(items, target);
-  });
-
-  // Фильтр для В наличие
-
-  var filterByAvailable = window.utils.debounce(function (evt, items) {
-    var target = evt.target.innerText;
-    setCheckedOnFilter(evt.target);
-
-    // если фильтр по избранному пуст добавляем таргет в фильтры
-    if (activeFilters.available.length === 0) {
-      activeFilters.available.push(target);
-    } else if (activeFilters.available.indexOf(target) !== -1 && activeFilters.available.length === 1) {
-      // если таргет есть в фильтрах и длина массива равна 1, очищаем массив
-      activeFilters.available = [];
-    }
-
-    if (activeFilters.foodKinds.length > 0) {
-      activeFilters.foodKinds = [];
-    }
-    if (activeFilters.foodProperties.length > 0) {
-      activeFilters.foodProperties = [];
-    }
-    if (activeFilters.price.length > 0) {
-      activeFilters.price = [];
-    }
-    if (activeFilters.favorites.length > 0) {
-      activeFilters.favorites = [];
-    }
-    if (activeFilters.sort.length > 0) {
-      activeFilters.sort = [];
-    }
-
-    removeItems();
-    applyFilters(items, target);
-  });
-
-  // Вспомогательная функция для сортировки по рейтингу по убыванию
-
-  var getHigherRatingFirst = function (arrey) {
-    var arreyCopy = arrey.slice();
-    var newArrey = [];
-    for (var i = 5; i > 0; i--) {
-      var filteredArrey = arreyCopy.filter(function (it) {
-        return it.rating.value === i;
-      });
-      newArrey = newArrey.concat(getHigherRatingNumberFirst(filteredArrey));
-    }
-    return newArrey;
-  };
-
-  var getHigherRatingNumberFirst = function (arrey) {
-    var arreyCopy = arrey.slice();
-    arreyCopy.sort(function (first, second) {
-      if (first.rating.number < second.rating.number) {
-        return 1;
-      } else if (first.rating.number > second.rating.number) {
-        return -1;
-      } else {
-        return 0;
-      }
-    });
-    return arreyCopy;
-  };
-
-  // Функция по определению свойства массива sort
-
-  var filterBySort = window.utils.debounce(function (evt, items) {
-    var target = evt.target.innerText;
-    setCheckedOnFilter(evt.target);
-    activeFilters.sort = target;
-    removeItems();
-    applyFilters(items, target);
-  });
-
-  // Функция по сортировке
-
-  var getSortedList = function (arrey) {
-    var arreyCopy = arrey.slice();
-    switch (activeFilters.sort) {
-      case 'Сначала популярные': {
-        arreyCopy = goods;
-        break;
-      }
-      case 'Сначала дорогие': {
-        arreyCopy.sort(function (first, second) {
-          if (first.price < second.price) {
-            return 1;
-          } else if (first.price > second.price) {
-            return -1;
-          } else {
-            return 0;
-          }
-        });
-        break;
-      }
-      case 'Сначала дешёвые': {
-        arreyCopy.sort(function (first, second) {
-          if (first.price > second.price) {
-            return 1;
-          } else if (first.price < second.price) {
-            return -1;
-          } else {
-            return 0;
-          }
-        });
-        break;
-      }
-      case 'По рейтингу': {
-        arreyCopy = getHigherRatingFirst(arreyCopy);
-        break;
-      }
-    }
-    return arreyCopy;
-  };
-
-  // Oбработчик на клик по фильтрам
-  var onFiltersClick = function (evt) {
-    evt.preventDefault();
-    var target = evt.target.innerText;
-    if (target === 'Мороженое' || target === 'Газировка' || target === 'Жевательная резинка' || target === 'Мармелад' || target === 'Зефир') {
-      filterByKind(evt, goods);
-    } else if (target === 'Без сахара') {
-      filterByFoodProperty(evt, goods, 'sugar');
-    } else if (target === 'Безглютеновое') {
-      filterByFoodProperty(evt, goods, 'gluten');
-    } else if (target === 'Вегетарианское') {
-      filterByFoodProperty(evt, goods, 'vegetarian');
-    } else if (target === 'Только избранное') {
-      filterByFavorite(evt, goods);
-    } else if (target === 'В наличии') {
-      filterByAvailable(evt, goods);
-    } else if (target === 'Сначала популярные') {
-      filterBySort(evt, goods);
-    } else if (target === 'Сначала дорогие') {
-      filterBySort(evt, goods);
-    } else if (target === 'Сначала дешёвые') {
-      filterBySort(evt, goods);
-    } else if (target === 'По рейтингу') {
-      filterBySort(evt, goods);
-    }
-
-    putNumberOfGoodsInSpan(target);
-  };
-
-  // Обработчик mousemove для ценового фильтра
-
-  var onPriceFilterMousemove = function (evt) {
-    evt.preventDefault();
-    filterByPrice(evt, goods);
-  };
-
-  var submitButton = filterSidebar.querySelector('.catalog__submit');
-
-  var onSubmitButton = function () {
-    activeFilters.foodKinds = [];
-    activeFilters.foodProperties = [];
-    activeFilters.price = [];
-    activeFilters.favorites = [];
-    activeFilters.available = [];
-    activeFilters.popular = [];
-    activeFilters.expensiveFirst = [];
-    activeFilters.cheapFirst = [];
-    activeFilters.foodRating = [];
-    filteredList = [];
-    removeItems();
-    renderCards(goods);
-  };
-
-  submitButton.addEventListener('click', onSubmitButton);
-
-  filterSidebar.addEventListener('click', onFiltersClick);
-
-  rangeButtonRight.addEventListener('mousemove', onPriceFilterMousemove);
-
-  rangeButtonLeft.addEventListener('mousemove', onPriceFilterMousemove);
 
   // Отрисовываем карточки
 
-  var renderCards = function (data) {
+  window.renderCards = function (data) {
 
     // Создаем фрагмент
 
@@ -815,8 +333,10 @@
               good.amount += good.orderedAmount;
               good.orderedAmount = 0;
               cart.removeChild(evt.currentTarget);
+              getClearForm(formOrder);
               window.setDisabledAttribute(formOrder);
               submitBtn.setAttribute('disabled', 'disabled');
+              //window.getFormBlocked();
             }
           }
         });
@@ -840,8 +360,10 @@
             good.amount += good.orderedAmount;
             good.orderedAmount = 0;
             evt.currentTarget.remove();
+            getClearForm(formOrder);
             window.setDisabledAttribute(formOrder);
             submitBtn.setAttribute('disabled', 'disabled');
+            //window.getFormBlocked();
           }
         });
       }
@@ -910,9 +432,14 @@
     cart.innerHTML = '';
     cart.appendChild(fragment);
 
-    // Удаляем сообщение из корзины
+    // Удаляем/возвращаем сообщение из корзины
 
-    removeCartMessage();
+    if (addedProductsList.length === 0) {
+      putEmptyCartMessage();
+    } else {
+      removeCartMessage();
+      //removeEmptyCartMessage();
+    }
 
     // Делаем форму заказа активной
 
