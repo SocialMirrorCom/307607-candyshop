@@ -14,9 +14,11 @@
 
   window.setDisabledAttribute = function (form) {
     var inputsArrey = form.querySelectorAll('input');
+
     for (var i = 0; i < inputsArrey.length; i++) {
-      inputsArrey[i].setAttribute('disabled', 'disabled');
+      if (!inputsArrey[i].disabled) {
+        inputsArrey[i].setAttribute('disabled', 'disabled');
+      }
     }
   };
-
 })();
