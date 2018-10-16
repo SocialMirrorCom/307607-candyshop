@@ -1,6 +1,10 @@
 'use strict';
 (function () {
 
+  var FILTER_PRICE_MIN = 15;
+  var FILTER_PRICE_MAX = 85;
+  var LEFT_RANGE_BUTTON_X = 104.75 - 68;
+  var RIGHT_RANGE_BUTTON_X = 266.25 - 68;
 
   // Находим и записываем в переменные инпуты Бокового Фильтра
 
@@ -12,7 +16,7 @@
   var rangePriceMin = range.querySelector('.range__price--min');
   var rangePriceMax = range.querySelector('.range__price--max');
   var rangeFillLine = range.querySelector('.range__fill-line');
-   var catalogCards = document.querySelector('.catalog__cards');
+  var catalogCards = document.querySelector('.catalog__cards');
 
   var filteredList = [];
 
@@ -70,6 +74,7 @@
   var onShowAll = function () {
     window.renderCards(window.goods);
     catalogCards.removeChild(emptyFilterMessage);
+    removeAttributeChecked(showAllButton.value);
   };
 
   showAllButton.addEventListener('click', onShowAll);
@@ -83,6 +88,17 @@
       input.checked = false;
     } else {
       input.checked = true;
+    }
+  };
+
+  var removeAttributeChecked = function (inputValue) {
+    var inputs = filterSidebar.querySelectorAll('.input-btn__input');
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs[i].value === inputValue) {
+        inputs[i].checked = true;
+      } else {
+        inputs[i].checked = false;
+      }
     }
   };
 
@@ -310,15 +326,21 @@
 
   var filterByFavorite = window.utils.debounce(function (evt, items) {
     var target = evt.target.innerText;
-    setCheckedOnFilter(evt.target);
+    var favoriteInput = filterSidebar.querySelector('#filter-favorite').value;
+
 
     // если фильтр по избранному пуст добавляем таргет в фильтры
     if (activeFilters.favorites.length === 0) {
       activeFilters.favorites.push(target);
+      setCheckedOnFilter(evt.target);
+      removeAttributeChecked(favoriteInput);
+
     } else if (activeFilters.favorites.indexOf(target) !== -1 && activeFilters.favorites.length === 1) {
       // если таргет есть в фильтрах и длина массива равна 1, очищаем массив
       activeFilters.favorites = [];
+      setCheckedOnFilter(evt.target);
     }
+
     if (activeFilters.foodKinds.length > 0) {
       activeFilters.foodKinds = [];
     }
@@ -344,14 +366,17 @@
 
   var filterByAvailable = window.utils.debounce(function (evt, items) {
     var target = evt.target.innerText;
-    setCheckedOnFilter(evt.target);
+    var availableInput = filterSidebar.querySelector('#filter-availability').value;
 
     // если фильтр по избранному пуст добавляем таргет в фильтры
     if (activeFilters.available.length === 0) {
       activeFilters.available.push(target);
+      setCheckedOnFilter(evt.target);
+      removeAttributeChecked(availableInput);
     } else if (activeFilters.available.indexOf(target) !== -1 && activeFilters.available.length === 1) {
       // если таргет есть в фильтрах и длина массива равна 1, очищаем массив
       activeFilters.available = [];
+      setCheckedOnFilter(evt.target);
     }
 
     if (activeFilters.foodKinds.length > 0) {
@@ -501,7 +526,8 @@
     activeFilters.foodRating = [];
     filteredList = [];
     removeItems();
-    window.renderCards(window.window.goods);
+    window.renderCards(window.goods);
+    removeAttributeChecked(submitButton.value);
   };
 
   submitButton.addEventListener('click', onSubmitButton);
