@@ -542,7 +542,6 @@
 
   rangeButtonLeft.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
-    console.log(rangeButtonLeft.getBoundingClientRect().left);
     var shiftX = evt.clientX - rangeButtonLeft.getBoundingClientRect().left;
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
@@ -602,7 +601,6 @@
 
   rangeButtonRight.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
-    console.log(rangeButtonRight.getBoundingClientRect().right);
 
     var shiftX = rangeButtonRight.getBoundingClientRect().right - evt.clientX;
 

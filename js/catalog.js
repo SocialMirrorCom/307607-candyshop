@@ -1,11 +1,6 @@
 'use strict';
 (function () {
 
-  var FILTER_PRICE_MIN = 15;
-  var FILTER_PRICE_MAX = 85;
-  var LEFT_RANGE_BUTTON_X = 104.75 - 68;
-  var RIGHT_RANGE_BUTTON_X = 266.25 - 68;
-
   // Модальное окно ошибки
 
   var modalError = document.querySelector('.modal--error');
@@ -83,10 +78,6 @@
 
   var putEmptyCartMessage = function () {
     cart.appendChild(emptyCartMessage);
-  };
-
-  var removeEmptyCartMessage = function () {
-    cart.removeChild(emptyCartMessage);
   };
 
   // Получаем сумму количества заказанных товаров.
@@ -215,6 +206,10 @@
             addedProductsList.push(good);
             good.orderedAmount += 1;
             good.amount -= 1;
+            // Делаем форму заказа активной
+
+            window.removeDisabledAttribute(formOrder);
+            submitBtn.removeAttribute('disabled', 'disabled');
           }
         }
       }
@@ -240,13 +235,13 @@
   window.goods = [];
 
   var onLoad = function (data) {
-    goods = data;
-    for (var i = 0; i < goods.length; i++) {
-      goods[i].orderedAmount = 0;
-      goods[i].favorite = false;
+    window.goods = data;
+    for (var i = 0; i < window.goods.length; i++) {
+      window.goods[i].orderedAmount = 0;
+      window.goods[i].favorite = false;
     }
     closeCardLoad();
-    renderCards(goods);
+    window.renderCards(window.goods);
   };
 
   var closeCardLoad = function () {
@@ -336,7 +331,6 @@
               getClearForm(formOrder);
               window.setDisabledAttribute(formOrder);
               submitBtn.setAttribute('disabled', 'disabled');
-              //window.getFormBlocked();
             }
           }
         });
@@ -363,7 +357,6 @@
             getClearForm(formOrder);
             window.setDisabledAttribute(formOrder);
             submitBtn.setAttribute('disabled', 'disabled');
-            //window.getFormBlocked();
           }
         });
       }
@@ -420,7 +413,6 @@
     modalSuccessClose.addEventListener('click', oncloseModalSuccess);
     modalSuccessClose.addEventListener('keydown', oncloseModalSuccess);
 
-
     return cardElement;
   };
 
@@ -438,13 +430,7 @@
       putEmptyCartMessage();
     } else {
       removeCartMessage();
-      //removeEmptyCartMessage();
     }
-
-    // Делаем форму заказа активной
-
-    window.removeDisabledAttribute(formOrder);
-    submitBtn.removeAttribute('disabled', 'disabled');
   };
 
   // Запускаем функцию и размещаем товар на сайте

@@ -45,7 +45,6 @@
     }
   };
 
-
   window.getFormBlocked();
 
   // Алгоритм Луна
@@ -213,7 +212,7 @@
   var deliverStoreList = document.querySelector('.deliver__store-list');
   var activeStoreInput;
 
-  var getCorrectMapAndAddress = function (evt) {
+  var getCorrectMapAndAddress = function () {
     switch (activeStoreInput) {
       case 'academicheskaya': {
         mapImg.setAttribute('src', 'img/map/academicheskaya.jpg');
